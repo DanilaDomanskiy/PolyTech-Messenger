@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Web.Application\Web.Application.csproj" />
     <ProjectReference Include="..\Web.Domain\Web.Core.csproj" />
   </ItemGroup>
