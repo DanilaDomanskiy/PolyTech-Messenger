@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Web.Domain\Web.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CSharpFunctionalExtensions" Version="3.0.0" />
+  </ItemGroup>
+
 </Project>
