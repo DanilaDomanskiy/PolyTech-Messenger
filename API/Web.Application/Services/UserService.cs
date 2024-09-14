@@ -22,7 +22,7 @@ namespace Web.Application.Services
             _userRepository = userRepository;
             _jwtProvider = jwtProvider;
         }
-
+        
         public async Task<Result> RegisterUserAsync(RegisterUserDTO userDTO)
         {
             var isUserExists = await _userRepository.IsUserExists(userDTO.Email);

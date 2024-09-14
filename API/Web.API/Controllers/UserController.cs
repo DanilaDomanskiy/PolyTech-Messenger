@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web.API.Models;
-using Web.API.ViewModels;
+using Web.API.ViewModels.UserVIewModels;
 using Web.Application.DTO_s;
 using Web.Application.Interfaces.IServices;
 

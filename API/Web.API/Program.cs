@@ -4,6 +4,7 @@ using System.Text;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
+using Web.Core.IRepositories;
 using Web.Infrastructure;
 using Web.Persistence;
 using Web.Persistence.Repositories;
@@ -49,12 +50,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
+builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 // Add services to the container.
 builder.Services.AddDbContext<WebContext>();
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -70,10 +76,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<ChatHub>("/hub");
 app.MapControllers();
 
 app.Run();
