@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Чат</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", Arial, sans-serif;
+        background: linear-gradient(135deg, #74ebd5, #9face6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 20px;
+      }
+
+      .chat-container {
+        width: 100%;
+        max-width: 500px;
+        height: 600px;
+        background-color: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .chat-header {
+        padding: 20px;
+        background-color: #3498db;
+        color: white;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+      }
+
+      .chat-box {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        background-color: #f9f9f9;
+      }
+
+      .message {
+        margin-bottom: 15px;
+        padding: 12px;
+        border-radius: 20px;
+        max-width: 70%;
+        word-wrap: break-word;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .message.left {
+        background-color: #ecf0f1;
+        align-self: flex-start;
+      }
+
+      .message.right {
+        background-color: #3498db;
+        color: white;
+        align-self: flex-end;
+      }
+
+      .chat-input-section {
+        display: flex;
+        padding: 15px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+
+      .chat-input-section input {
+        flex-grow: 1;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        outline: none;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .chat-input-section button {
+        padding: 12px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        margin-left: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .chat-input-section button:hover {
+        background-color: #2980b9;
+      }
+
+      .chat-box {
+        scroll-behavior: smooth;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header" id="chatTitle">Чат</div>
+      <div class="chat-box" id="chatBox">
+        <!-- Сообщения будут добавляться сюда -->
+      </div>
+      <div class="chat-input-section">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Введите сообщение..."
+        />
+        <button id="sendMessageButton">Отправить</button>
+      </div>
+    </div>
+
+    <script>
+      // Получаем параметры из URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const chat = urlParams.get("chat") || "Чат";
+
+      // Устанавливаем заголовок чата
+      document.getElementById("chatTitle").innerText =
+        chat.charAt(0).toUpperCase() + chat.slice(1);
+
+      document
+        .getElementById("sendMessageButton")
+        .addEventListener("click", sendMessage);
+
+      function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const messageText = input.value.trim();
+
+        if (messageText !== "") {
+          const messageElement = document.createElement("div");
+          messageElement.classList.add("message", "right");
+          messageElement.innerText = messageText;
+          document.getElementById("chatBox").appendChild(messageElement);
+
+          // Прокрутка вниз после отправки сообщения
+          document.getElementById("chatBox").scrollTop =
+            document.getElementById("chatBox").scrollHeight;
+
+          // Очистка поля ввода
+          input.value = "";
+
+          // Пример добавления ответа с другой стороны
+          setTimeout(() => {
+            const responseElement = document.createElement("div");
+            responseElement.classList.add("message", "left");
+            responseElement.innerText = "Это ответ.";
+            document.getElementById("chatBox").appendChild(responseElement);
+
+            document.getElementById("chatBox").scrollTop =
+              document.getElementById("chatBox").scrollHeight;
+          }, 1000); // Задержка перед ответом
+        }
+      }
+
+      // Отправка сообщения по Enter
+      document
+        .getElementById("messageInput")
+        .addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            sendMessage();
+          }
+        });
+    </script>
+  </body>
+</html>
