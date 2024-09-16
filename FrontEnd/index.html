@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>PolyTech Messenger</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body>    
+<body>
     <div class="wrapper">
         <div class="content">
-            <div class="header">
+            <header class="header">
                 <div class="logo">
-                    <img src="src/logoBNTU.jpg" alt="Логотип БНТУ">
+                    <img src="src/logoBNTU.png" alt="Логотип БНТУ">
                 </div>
-            </div>
-            <div class="main">
-                <div class="h1">
-                    PolyTech Messenger
-                </div>
-                <form action="#" method="post">
-                    <div class="form-authorization">                        
-                        <div class="form-authorization__login">
-                            <input type="text" class="login" name="login" placeholder="Введите логин...">
-                        </div>
-                        <div class="form-authorization__password">
-                            <input type="password" class="password" name="password" placeholder="Введите пароль...">
-                        </div>                        
-                        <div class="link-registration">
-                            <a href="#">Зарегистрироваться</a>
-                        </div>
-                        <div class="button-signUp">
-                            <button type="submit" name="button-signUp" class="signUp">Войти</button>
-                        </div>
+            </header>
+
+            <main class="main">
+                <h1 class="title">PolyTech Messenger</h1>
+                <form action="#" method="post" class="auth-form">
+                    <div class="form-group">
+                        <input type="text" class="input login" name="login" placeholder="Введите логин...">
                     </div>
-                </form>
-                
-            </div>
-            <div class="footer"></div>
+                    <div class="form-group">
+                        <input type="password" class="input password" name="password" placeholder="Введите пароль...">
+                    </div>
+                    <div class="link-registration">
+                        <a href="#">Зарегистрироваться</a>
+                    </div>
+                    <div class="button-signUp">
+                        <button type="submit" name="button-signUp" class="signUp">Войти</button>
+                    </div>
+                </form>                
+            </main>
+
+            <footer class="footer">
+                <p>© 2024 PolyTech Messenger. Все права защищены.</p>
+            </footer>
         </div>
     </div>
     <script src="JavaScript.js"></script>
