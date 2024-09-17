@@ -117,12 +117,6 @@
       .signUp:hover {
         background-color: #acb6e5;
       }
-
-      .footer {
-        margin-top: 30px;
-        font-size: 14px;
-        color: #777;
-      }
     </style>
   </head>
   <body>
@@ -162,9 +156,6 @@
           </div>
         </form>
       </div>
-
-      <!-- Подвал -->
-      <div class="footer">© 2024 PolyTech Messenger</div>
     </div>
 
     <script>
@@ -189,7 +180,7 @@
             );
 
             if (response.ok) {
-              window.location.href = "chat.html"; // Перенаправление на страницу чата
+              window.location.href = "chat-selection.html";
             } else {
               const errorMessage = await response.text();
               alert(errorMessage);

@@ -1,10 +1,10 @@
 ﻿namespace Web.Application.DTO_s.Message
 {
-    public class SaveMessageViewModel
+    public class SendMessageViewModel
     {
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
-        public int SenderId { get; set; }
+        public string ConnectionId { get; set; }
         public int? GroupId { get; set; }
         public int? PrivateChatId { get; set; }
     }

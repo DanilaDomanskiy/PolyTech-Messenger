@@ -48,9 +48,9 @@ namespace Web.API.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddMonths(1)
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddMonths(6)
                 };
 
                 Response.Cookies.Append("AppCookie", token.Value, cookieOptions);

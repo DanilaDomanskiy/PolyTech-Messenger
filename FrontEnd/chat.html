@@ -130,57 +130,111 @@
         <button id="sendMessageButton">Отправить</button>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@7.0.5/dist/browser/signalr.min.js"></script>
     <script>
-      // Получаем параметры из URL
       const urlParams = new URLSearchParams(window.location.search);
-      const chat = urlParams.get("chat") || "Чат";
+      const chatId = urlParams.get("chatId");
+      document.getElementById("chatTitle").innerText = `Чат ${chatId}`;
 
-      // Устанавливаем заголовок чата
-      document.getElementById("chatTitle").innerText =
-        chat.charAt(0).toUpperCase() + chat.slice(1);
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7205/chatHub", { withCredentials: false })
+        .build();
+
+      connection.on(
+        "ReceiveMessage",
+        function (userName, userEmail, message, timestamp) {
+          const messageElement = document.createElement("div");
+          messageElement.classList.add("message", "left");
+          messageElement.innerHTML = `<strong>${userName}</strong>: ${message} <span style="font-size: 0.8em; color: #aaa;">${new Date(
+            timestamp
+          ).toLocaleTimeString()}</span>`;
+          document.getElementById("chatBox").appendChild(messageElement);
+
+          document.getElementById("chatBox").scrollTop =
+            document.getElementById("chatBox").scrollHeight;
+        }
+      );
+
+      async function loadMessages() {
+        try {
+          const response = await fetch(
+            `https://localhost:7205/api/Message/byChatId/${chatId}`
+          );
+          const messages = await response.json();
+          messages.forEach((msg) => {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message", "left");
+            messageElement.innerHTML = `<strong>${msg.senderName}</strong>: ${
+              msg.content
+            } <span style="font-size: 0.8em; color: #aaa;">${new Date(
+              msg.timestamp
+            ).toLocaleTimeString()}</span>`;
+            document.getElementById("chatBox").appendChild(messageElement);
+          });
+          document.getElementById("chatBox").scrollTop =
+            document.getElementById("chatBox").scrollHeight;
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const messageText = input.value.trim();
+        const timestamp = new Date().toISOString();
+        const privateChatId = chatId;
+
+        if (messageText !== "") {
+          const messageElement = document.createElement("div");
+          messageElement.classList.add("message", "right");
+          messageElement.innerHTML = `${messageText} <span style="font-size: 0.8em; color: #aaa;">${new Date(
+            timestamp
+          ).toLocaleTimeString()}</span>`;
+          document.getElementById("chatBox").appendChild(messageElement);
+
+          document.getElementById("chatBox").scrollTop =
+            document.getElementById("chatBox").scrollHeight;
+
+          input.value = "";
+
+          try {
+            const response = await fetch("https://localhost:7205/api/Message", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                content: messageText,
+                timestamp: timestamp,
+                connectionId: connection.connectionId,
+                privateChatId: chatId,
+              }),
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      }
 
       document
         .getElementById("sendMessageButton")
         .addEventListener("click", sendMessage);
 
-      function sendMessage() {
-        const input = document.getElementById("messageInput");
-        const messageText = input.value.trim();
-
-        if (messageText !== "") {
-          const messageElement = document.createElement("div");
-          messageElement.classList.add("message", "right");
-          messageElement.innerText = messageText;
-          document.getElementById("chatBox").appendChild(messageElement);
-
-          // Прокрутка вниз после отправки сообщения
-          document.getElementById("chatBox").scrollTop =
-            document.getElementById("chatBox").scrollHeight;
-
-          // Очистка поля ввода
-          input.value = "";
-
-          // Пример добавления ответа с другой стороны
-          setTimeout(() => {
-            const responseElement = document.createElement("div");
-            responseElement.classList.add("message", "left");
-            responseElement.innerText = "Это ответ.";
-            document.getElementById("chatBox").appendChild(responseElement);
-
-            document.getElementById("chatBox").scrollTop =
-              document.getElementById("chatBox").scrollHeight;
-          }, 1000); // Задержка перед ответом
-        }
-      }
-
-      // Отправка сообщения по Enter
       document
         .getElementById("messageInput")
         .addEventListener("keydown", function (event) {
           if (event.key === "Enter") {
             sendMessage();
           }
+        });
+
+      connection
+        .start()
+        .then(async () => {
+          await connection.invoke("JoinGroup", `pc${chatId}`);
+        })
+        .catch(function (err) {
+          console.error(err.toString());
         });
     </script>
   </body>

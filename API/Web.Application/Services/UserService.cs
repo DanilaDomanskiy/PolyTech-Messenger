@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Web.Application.DTO_s;
+using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
@@ -52,6 +53,22 @@ namespace Web.Application.Services
             var token = _jwtProvider.GenerateToken(user);
 
             return Result.Success(token);
+        }
+
+        public async Task<UserDTO?> GetUserAsync(int id)
+        {
+            var user = await _userRepository.ReadAsyncById(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserDTO
+            {
+                Name = user.Name,
+                Email = user.Email
+            };
         }
     }
 }

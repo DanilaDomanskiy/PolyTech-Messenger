@@ -3,6 +3,7 @@ using Web.Application.DTO_s.Message;
 using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
+using Web.Core.IRepositories;
 using Web.Persistence.Repositories;
 
 namespace Web.Application.Services
@@ -37,7 +38,8 @@ namespace Web.Application.Services
             {
                 Content = message.Content,
                 Timestamp = message.Timestamp,
-                SenderName = message.Sender.Name
+                SenderName = message.Sender.Name,
+                SenderId = message.Sender.Id
             });
         }
     }
