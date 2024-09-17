@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PolyTech Messenger - Регистрация</title>
+    <link rel="stylesheet" href="styles_rf.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="content">
+        <header class="header">
+          <div class="logo">
+            <img src="src_rf/logoBNTU.png" alt="Логотип БНТУ" />
+          </div>
+        </header>
+
+        <main class="main">
+          <h1 class="title">Регистрация</h1>
+          <form action="#" method="post" class="auth-form">
+            <div class="form-group">
+              <input
+                type="text"
+                class="input name"
+                name="name"
+                placeholder="Введите имя..."
+                required
+                minlength="2"
+                maxlength="100"
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                class="input email"
+                name="email"
+                placeholder="Введите почту..."
+                required
+                minlength="2"
+                maxlength="100"
+              />
+            </div>
+            <div class="form-group">
+              <input
+                type="password"
+                class="input password"
+                name="password"
+                placeholder="Введите пароль..."
+                required
+                minlength="6"
+                maxlength="100"
+              />
+            </div>
+            <div class="button-signUp">
+              <button type="submit" name="button-signUp" class="signUp">
+                Зарегистрироваться
+              </button>
+            </div>
+          </form>
+        </main>
+
+        <footer class="footer">
+          <p>© 2024 PolyTech Messenger. Все права защищены.</p>
+        </footer>
+      </div>
+    </div>
+    <script src="JavaScript_rf.js"></script>
+  </body>
+</html>
