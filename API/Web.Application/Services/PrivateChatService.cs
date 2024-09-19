@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
+using Web.Core.Entites;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -44,6 +45,16 @@ namespace Web.Application.Services
                 User1Id = chat.User1Id,
                 User2Id = chat.User2Id
             };
+        }
+
+        public async Task CreateChatAsync(PrivateChatUsersDTO model)
+        {
+            var privateChat = new PrivateChat
+            {
+                User1Id = model.User1Id,
+                User2Id = model.User2Id
+            };
+            await _privateChatRepository.AddChatAsync(privateChat);
         }
     }
 }
