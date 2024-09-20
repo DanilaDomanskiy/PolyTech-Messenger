@@ -12,11 +12,9 @@ using Web.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Настройки JWT
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 var jwtOptions = builder.Configuration.GetSection("JwtOptions").Get<JwtOptions>();
 
-// Настройка аутентификации JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -43,7 +41,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Настройка CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
@@ -55,8 +52,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-
-// Регистрация зависимостей
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -66,18 +61,15 @@ builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
-// База данных и SignalR
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Конфигурация pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

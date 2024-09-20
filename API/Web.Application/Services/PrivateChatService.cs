@@ -25,8 +25,7 @@ namespace Web.Application.Services
                 return new PrivateChatUserDTO
                 {
                     PrivateChatId = chat.Id,
-                    UserName = otherUser.Name,
-                    UserEmail = otherUser.Email
+                    UserName = otherUser.Name
                 };
             });
         }

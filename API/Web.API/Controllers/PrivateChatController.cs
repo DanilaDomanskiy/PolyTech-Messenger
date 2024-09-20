@@ -26,8 +26,7 @@ namespace Web.API.Controllers
             return Ok(chats.Select(chat => new PrivateChatUserViewModel
             {
                 PrivateChatId = chat.PrivateChatId,
-                UserName = chat.UserName,
-                UserEmail = chat.UserEmail
+                SecondUserName = chat.UserName
             }));
         }
 
