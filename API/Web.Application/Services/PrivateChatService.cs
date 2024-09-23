@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Web.Application.DTO_s.PrivateChat;
+﻿using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
 using Web.Core.IRepositories;
