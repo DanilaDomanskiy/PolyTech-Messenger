@@ -14,22 +14,31 @@ namespace Web.API.Controllers
         private readonly IMessageService _messageService;
         private readonly IHubContext<ChatHub> _chatHub;
         private readonly IUserService _userService;
+        private readonly IPrivateChatService _privateChatService;
 
         public MessageController(
             IMessageService messageService,
             IHubContext<ChatHub> chatHub,
-            IUserService userService)
+            IUserService userService,
+            IPrivateChatService privateChatService)
         {
             _messageService = messageService;
             _chatHub = chatHub;
             _userService = userService;
+            _privateChatService = privateChatService;
         }
 
-        [HttpGet("byChatId/{id}")]
-        public async Task<IActionResult> GetMessagesByChatId(int id)
+        [HttpGet("byChatId/{chatId}")]
+        public async Task<IActionResult> GetMessagesByChatId(int chatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var messages = await _messageService.GetMessagesByChatIdAsync(id);
+            var isUserExist = await _privateChatService.IsUserExistInChat(userId, chatId);
+
+            if (!isUserExist)
+            { 
+                return Unauthorized();
+            }
+            var messages = await _messageService.GetMessagesByChatIdAsync(chatId);
             return Ok(messages.Select(message => new ReadMessageViewModel
             {
                 Content = message.Content,

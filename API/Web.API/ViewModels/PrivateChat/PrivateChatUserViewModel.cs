@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Web.API.ViewModels.PrivateChat
+﻿namespace Web.API.ViewModels.PrivateChat
 {
     public class PrivateChatUserViewModel
     {

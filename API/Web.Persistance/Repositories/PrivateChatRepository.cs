@@ -17,7 +17,9 @@ namespace Web.Persistence.Repositories
         {
             return await _context.PrivateChats
                 .AsNoTracking()
-                .FirstOrDefaultAsync(chat => chat.Id == id);
+                .Include(chat => chat.User1)
+                .Include(chat => chat.User2)
+                .FirstOrDefaultAsync(chat => chat.Id == id); 
         }
 
         public async Task AddChatAsync(PrivateChat privateChat)

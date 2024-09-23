@@ -19,7 +19,7 @@ namespace Web.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetChats2UserName()
+        public async Task<IActionResult> GetChatsName()
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
             var chats = await _privateChatService.GetUserChatsAsync(userId);
@@ -41,6 +41,14 @@ namespace Web.API.Controllers
             };
             await _privateChatService.CreateChatAsync(privateChat);
             return Created();
+        }
+
+        [HttpGet("chatName/{privateChatId}")]
+        public async Task<IActionResult> GetUserName(int privateChatId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var userName = await _privateChatService.GetOtherUserNameAsync(userId, privateChatId);
+            return userName == null ? Unauthorized() : Ok(userName);
         }
     }
 }

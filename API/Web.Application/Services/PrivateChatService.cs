@@ -55,5 +55,25 @@ namespace Web.Application.Services
             };
             await _privateChatRepository.AddChatAsync(privateChat);
         }
+
+        public async Task<bool> IsUserExistInChat(int userId, int privateChatId)
+        {
+            var privateChat = await _privateChatRepository.GetChatAsync(privateChatId);
+
+            return privateChat == null ? false : 
+                privateChat.User1Id == userId || 
+                privateChat.User2Id == userId;
+        }
+
+        public async Task<string?> GetOtherUserNameAsync(int userId, int privateChatId)
+        {
+            var privateChat = await _privateChatRepository.GetChatAsync(privateChatId);
+            return privateChat == null ? null 
+                : privateChat.User1Id == userId 
+                ? privateChat.User2.Name
+                : privateChat.User2Id == userId
+                ? privateChat.User1.Name 
+                : null;
+        }
     }
 }
