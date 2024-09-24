@@ -26,12 +26,16 @@ namespace Web.API.Controllers
                 Password = model.Password
             };
 
-            var result = await _userService.RegisterUserAsync(user);
-            if (result.IsSuccess)
+            try
             {
-                return Created();
+                await _userService.RegisterUserAsync(user);
             }
-            return BadRequest(result.Error);
+            catch (InvalidOperationException)
+            {
+                return StatusCode(409);
+            }
+            
+            return Created();
         }
 
         [HttpPost("login")]
@@ -42,21 +46,24 @@ namespace Web.API.Controllers
                 Email = model.Login,
                 Password = model.Password
             };
-            var token = await _userService.LoginUserAsync(user);
-            if (token.IsSuccess)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddMonths(6)
-                };
 
-                Response.Cookies.Append("AppCookie", token.Value, cookieOptions);
-                return Ok();
+            var token = await _userService.LoginUserAsync(user);
+
+            if (token == null)
+            {
+                return StatusCode(409);
             }
-            return BadRequest(token.Error);
+            
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsHttps,
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddMonths(6)
+            };
+
+            Response.Cookies.Append("AppCookie", token, cookieOptions);
+            return Ok();
         }
 
         [HttpPost("logout")]

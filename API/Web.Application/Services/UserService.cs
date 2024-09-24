@@ -1,5 +1,4 @@
-﻿using CSharpFunctionalExtensions;
-using Web.Application.DTO_s;
+﻿using Web.Application.DTO_s;
 using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
@@ -24,12 +23,12 @@ namespace Web.Application.Services
             _jwtProvider = jwtProvider;
         }
         
-        public async Task<Result> RegisterUserAsync(RegisterUserDTO userDTO)
+        public async Task RegisterUserAsync(RegisterUserDTO userDTO)
         {
             var isUserExists = await _userRepository.IsUserExists(userDTO.Email);
             if (isUserExists)
             {
-                return Result.Failure("Пользователь с таким email, уже зарегистрирован!");
+                throw new InvalidOperationException();
             }
             var user = new User
             {
@@ -38,21 +37,20 @@ namespace Web.Application.Services
                 PasswordHash = _passwordHasher.Generate(userDTO.Password)
             };
             await _userRepository.AddUserAsync(user);
-            return Result.Success(user);
         }
 
-        public async Task<Result<string>> LoginUserAsync(AuthUserDTO userDTO)
+        public async Task<string?> LoginUserAsync(AuthUserDTO userDTO)
         {
             var user = await _userRepository.ReadAsyncByEmail(userDTO.Email);
 
             if (user == null || !_passwordHasher.Verify(userDTO.Password, user.PasswordHash))
             {
-                return Result.Failure<string>("Неверный логин или пароль!");
+                return null;
             }
 
             var token = _jwtProvider.GenerateToken(user);
 
-            return Result.Success(token);
+            return token;
         }
 
         public async Task<UserDTO?> GetUserAsync(int id)
