@@ -20,7 +20,7 @@ namespace Web.Application.Services
             {
                 Content = saveMessageDTO.Content,
                 Timestamp = saveMessageDTO.Timestamp,
-                SenderId = saveMessageDTO.SenderId,
+                SenderId = saveMessageDTO.SenderId, 
                 GroupId = saveMessageDTO?.GroupId,
                 PrivateChatId = saveMessageDTO?.PrivateChatId
             };
