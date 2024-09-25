@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Web.Application.DTO_s.Message;
+using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API.Controllers
@@ -15,17 +16,20 @@ namespace Web.API.Controllers
         private readonly IHubContext<ChatHub> _chatHub;
         private readonly IUserService _userService;
         private readonly IPrivateChatService _privateChatService;
+        private readonly IEncryptionService _encryptionService;
 
         public MessageController(
             IMessageService messageService,
             IHubContext<ChatHub> chatHub,
             IUserService userService,
-            IPrivateChatService privateChatService)
+            IPrivateChatService privateChatService,
+            IEncryptionService encryptionService)
         {
             _messageService = messageService;
             _chatHub = chatHub;
             _userService = userService;
             _privateChatService = privateChatService;
+            _encryptionService = encryptionService;
         }
 
         [HttpGet("byChatId/{chatId}")]
@@ -41,7 +45,13 @@ namespace Web.API.Controllers
 
             var messages = await _messageService.GetMessagesByChatIdAsync(chatId, userId);
 
-            return Ok(messages);
+            var encryptedMessages = messages.Select(message =>
+            {
+                message.Content = _encryptionService.Decrypt(message.Content);
+                return message;
+            }).ToList();
+
+            return Ok(encryptedMessages);
         }
 
         [HttpPost]
@@ -55,13 +65,13 @@ namespace Web.API.Controllers
                 return Unauthorized();
             }
 
-            await _chatHub.Clients
-                .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
-                .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
+            //await _chatHub.Clients
+            //    .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
+            //    .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
 
             var message = new SaveMessageDto
             {
-                Content = model.Content,
+                Content = _encryptionService.Encrypt(model.Content),
                 SenderId = senderId,
                 Timestamp = model.Timestamp,
                 GroupId = model?.GroupId,
