@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Web.API.Controllers
+namespace Web.API
 {
     public class ChatHub : Hub
     {

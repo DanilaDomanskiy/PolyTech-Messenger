@@ -1,6 +1,6 @@
 ﻿namespace Web.Application.DTO_s
 {
-    public class RegisterUserDTO
+    public class RegisterUserDto
     {
         public string Name { get; set; }
         public string Email { get; set; }

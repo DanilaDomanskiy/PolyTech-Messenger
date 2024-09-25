@@ -32,7 +32,7 @@ namespace Web.Persistence.Repositories
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<bool> IsUserExists(string email)
+        public async Task<bool> IsUserExistsAsync(string email)
         {
             return await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email);
         }

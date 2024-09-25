@@ -1,5 +1,4 @@
 ﻿using Web.Application.DTO_s;
-using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
@@ -23,9 +22,9 @@ namespace Web.Application.Services
             _jwtProvider = jwtProvider;
         }
         
-        public async Task RegisterUserAsync(RegisterUserDTO userDTO)
+        public async Task RegisterUserAsync(RegisterUserDto userDTO)
         {
-            var isUserExists = await _userRepository.IsUserExists(userDTO.Email);
+            var isUserExists = await _userRepository.IsUserExistsAsync(userDTO.Email);
             if (isUserExists)
             {
                 throw new InvalidOperationException();
@@ -39,9 +38,9 @@ namespace Web.Application.Services
             await _userRepository.AddUserAsync(user);
         }
 
-        public async Task<string?> LoginUserAsync(AuthUserDTO userDTO)
+        public async Task<string?> LoginUserAsync(AuthUserDto userDTO)
         {
-            var user = await _userRepository.ReadAsyncByEmail(userDTO.Email);
+            var user = await _userRepository.ReadAsyncByEmail(userDTO.Login);
 
             if (user == null || !_passwordHasher.Verify(userDTO.Password, user.PasswordHash))
             {
@@ -53,7 +52,7 @@ namespace Web.Application.Services
             return token;
         }
 
-        public async Task<UserDTO?> GetUserAsync(int id)
+        public async Task<string?> GetUserNameAsync(int id)
         {
             var user = await _userRepository.ReadAsyncById(id);
 
@@ -62,11 +61,7 @@ namespace Web.Application.Services
                 return null;
             }
 
-            return new UserDTO
-            {
-                Name = user.Name,
-                Email = user.Email
-            };
+            return user.Name;
         }
     }
 }

@@ -14,22 +14,22 @@ namespace Web.Application.Services
             _privateChatRepository = privateChatRepository;
         }
 
-        public async Task<IEnumerable<PrivateChatUserDTO>> GetUserChatsAsync(int userId)
+        public async Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
             return chats.Select(chat =>
             {
                 var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
 
-                return new PrivateChatUserDTO
+                return new PrivateChatUserDto
                 {
                     PrivateChatId = chat.Id,
-                    UserName = otherUser.Name
+                    SecondUserName = otherUser.Name
                 };
             });
         }
         
-        public async Task<PrivateChatUsersDTO?> GetChatUsersAsync(int id)
+        public async Task<PrivateChatUsersDto?> GetChatUsersAsync(int id)
         {
             var chat = await _privateChatRepository.GetChatAsync(id);
 
@@ -38,14 +38,14 @@ namespace Web.Application.Services
                 return null;
             }
 
-            return new PrivateChatUsersDTO
+            return new PrivateChatUsersDto
             { 
                 User1Id = chat.User1Id,
                 User2Id = chat.User2Id
             };
         }
 
-        public async Task CreateChatAsync(PrivateChatUsersDTO model)
+        public async Task CreateChatAsync(PrivateChatUsersDto model)
         {
             var privateChat = new PrivateChat
             {
@@ -55,7 +55,7 @@ namespace Web.Application.Services
             await _privateChatRepository.AddChatAsync(privateChat);
         }
 
-        public async Task<bool> IsUserExistInChat(int userId, int privateChatId)
+        public async Task<bool> IsUserExistInChatAsync(int userId, int privateChatId)
         {
             var privateChat = await _privateChatRepository.GetChatAsync(privateChatId);
 

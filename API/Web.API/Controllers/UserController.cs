@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web.API.ViewModels.UserVIewModels;
 using Web.Application.DTO_s;
 using Web.Application.Interfaces.IServices;
 
@@ -17,9 +16,9 @@ namespace Web.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto model)
         {
-            var user = new RegisterUserDTO
+            var user = new RegisterUserDto
             {
                 Name = model.Name,
                 Email = model.Email,
@@ -39,11 +38,11 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthViewModel model)
+        public async Task<IActionResult> Login([FromBody] AuthUserDto model)
         {
-            var user = new AuthUserDTO
+            var user = new AuthUserDto
             {
-                Email = model.Login,
+                Login = model.Login,
                 Password = model.Password
             };
 
