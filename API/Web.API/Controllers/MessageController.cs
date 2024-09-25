@@ -32,38 +32,34 @@ namespace Web.API.Controllers
         public async Task<IActionResult> GetMessagesByChatId(int chatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var isUserExist = await _privateChatService.IsUserExistInChat(userId, chatId);
+            var isUserExist = await _privateChatService.IsUserExistInChatAsync(userId, chatId);
 
             if (!isUserExist)
             { 
                 return Unauthorized();
             }
-            var messages = await _messageService.GetMessagesByChatIdAsync(chatId);
-            return Ok(messages.Select(message => new ReadMessageViewModel
-            {
-                Content = message.Content,
-                SenderName = message.SenderName,
-                Timestamp = message.Timestamp,
-                IsSender = message.SenderId == userId
-            }));
+
+            var messages = await _messageService.GetMessagesByChatIdAsync(chatId, userId);
+
+            return Ok(messages);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMassege([FromBody] SendMessageViewModel model)
+        public async Task<IActionResult> SendMassege([FromBody] SendMessageDto model)
         {
             var senderId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var user = await _userService.GetUserAsync(senderId);
+            var userName = await _userService.GetUserNameAsync(senderId);
 
-            if (user == null)
+            if (userName == null)
             {
                 return Unauthorized();
             }
 
             await _chatHub.Clients
                 .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
-                .SendAsync("ReceiveMessage", user.Name, model.Content, model.Timestamp);
+                .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
 
-            var message = new SaveMessageDTO
+            var message = new SaveMessageDto
             {
                 Content = model.Content,
                 SenderId = senderId,

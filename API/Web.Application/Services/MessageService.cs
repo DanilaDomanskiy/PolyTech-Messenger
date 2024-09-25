@@ -14,7 +14,7 @@ namespace Web.Application.Services
             _messageRepository = messageRepository;
         }
 
-        public async Task SaveMessageAsync(SaveMessageDTO saveMessageDTO)
+        public async Task SaveMessageAsync(SaveMessageDto saveMessageDTO)
         {
             var message = new Message
             {
@@ -28,15 +28,16 @@ namespace Web.Application.Services
             await _messageRepository.SaveMessageAsync(message);
         }
 
-        public async Task<IEnumerable<ReadMessageDTO>> GetMessagesByChatIdAsync(int chatId)
+        public async Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId)
         {
             var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
-            return messages.Select(message => new ReadMessageDTO
+            return messages.Select(message => new ReadMessageDto
             {
                 Content = message.Content,
                 Timestamp = message.Timestamp,
                 SenderName = message.Sender.Name,
-                SenderId = message.Sender.Id
+                SenderId = message.Sender.Id,
+                IsSender = message.SenderId == userId
             });
         }
     }

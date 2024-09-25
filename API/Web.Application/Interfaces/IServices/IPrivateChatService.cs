@@ -4,10 +4,10 @@ namespace Web.Application.Interfaces.IServices
 {
     public interface IPrivateChatService
     {
-        Task<IEnumerable<PrivateChatUserDTO>> GetUserChatsAsync(int userId);
-        Task<PrivateChatUsersDTO?> GetChatUsersAsync(int userId);
-        Task CreateChatAsync(PrivateChatUsersDTO model);
-        Task<bool> IsUserExistInChat(int userId, int privateChatId);
+        Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId);
+        Task<PrivateChatUsersDto?> GetChatUsersAsync(int userId);
+        Task CreateChatAsync(PrivateChatUsersDto model);
+        Task<bool> IsUserExistInChatAsync(int userId, int privateChatId);
         Task<string?> GetOtherUserNameAsync(int userId, int privateChatId);
     }
 }

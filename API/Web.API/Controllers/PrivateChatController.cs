@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.API.ViewModels.PrivateChat;
 using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 
@@ -23,18 +22,14 @@ namespace Web.API.Controllers
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
             var chats = await _privateChatService.GetUserChatsAsync(userId);
-            return Ok(chats.Select(chat => new PrivateChatUserViewModel
-            {
-                PrivateChatId = chat.PrivateChatId,
-                SecondUserName = chat.UserName
-            }));
+            return Ok(chats);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateChat([FromBody] int user2Id)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var privateChat = new PrivateChatUsersDTO
+            var privateChat = new PrivateChatUsersDto
             {
                 User1Id = userId,
                 User2Id = user2Id

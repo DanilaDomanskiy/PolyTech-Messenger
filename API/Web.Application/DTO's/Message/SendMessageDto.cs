@@ -1,6 +1,6 @@
 ﻿namespace Web.Application.DTO_s.Message
 {
-    public class SendMessageViewModel
+    public class SendMessageDto
     {
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
