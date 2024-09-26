@@ -32,7 +32,7 @@ namespace Web.API.Controllers
             _encryptionService = encryptionService;
         }
 
-        [HttpGet("byChatId/{chatId}")]
+        [HttpGet("byChatId{chatId}")]
         public async Task<IActionResult> GetMessagesByChatId(int chatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
