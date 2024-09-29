@@ -52,7 +52,7 @@ namespace Web.Application.Services
                 User1Id = model.User1Id,
                 User2Id = model.User2Id
             };
-            await _privateChatRepository.AddChatAsync(privateChat);
+            await _privateChatRepository.CreateAsync(privateChat);
         }
 
         public async Task<bool> IsUserExistInChatAsync(int userId, int privateChatId)

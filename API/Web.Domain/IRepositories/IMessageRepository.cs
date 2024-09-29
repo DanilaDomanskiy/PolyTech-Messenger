@@ -1,10 +1,9 @@
 ﻿using Web.Core.Entites;
 
-namespace Web.Persistence.Repositories
+namespace Web.Core.IRepositories
 {
-    public interface IMessageRepository
+    public interface IMessageRepository : IBaseRepository<Message>
     {
         Task<IEnumerable<Message>> GetMessagesByChatIdAsync(int privateChatId);
-        Task SaveMessageAsync(Message message);
     }
 }

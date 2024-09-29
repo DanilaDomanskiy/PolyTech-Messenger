@@ -1,7 +1,7 @@
 ﻿using Web.Application.DTO_s.Message;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
-using Web.Persistence.Repositories;
+using Web.Core.IRepositories;
 
 namespace Web.Application.Services
 {
@@ -25,7 +25,7 @@ namespace Web.Application.Services
                 PrivateChatId = saveMessageDTO?.PrivateChatId
             };
 
-            await _messageRepository.SaveMessageAsync(message);
+            await _messageRepository.CreateAsync(message);
         }
 
         public async Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId)
