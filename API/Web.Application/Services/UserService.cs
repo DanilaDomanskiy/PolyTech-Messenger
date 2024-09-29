@@ -2,7 +2,7 @@
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
-using Web.Persistence.Repositories;
+using Web.Core.IRepositories;
 
 namespace Web.Application.Services
 {
@@ -35,7 +35,7 @@ namespace Web.Application.Services
                 Email = userDTO.Email,
                 PasswordHash = _passwordHasher.Generate(userDTO.Password)
             };
-            await _userRepository.AddUserAsync(user);
+            await _userRepository.CreateAsync(user);
         }
 
         public async Task<string?> LoginUserAsync(AuthUserDto userDTO)
