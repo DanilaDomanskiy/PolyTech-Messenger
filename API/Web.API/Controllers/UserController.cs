@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web.API.ViewModels.UserVIewModels;
 using Web.Application.DTO_s;
 using Web.Application.Interfaces.IServices;
 
@@ -17,46 +16,57 @@ namespace Web.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromBody] RegisterViewModel model)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto model)
         {
-            var user = new RegisterUserDTO
+            var user = new RegisterUserDto
             {
                 Name = model.Name,
                 Email = model.Email,
                 Password = model.Password
             };
 
-            var result = await _userService.RegisterUserAsync(user);
-            if (result.IsSuccess)
+            try
             {
-                return Created();
+                await _userService.RegisterUserAsync(user);
             }
-            return BadRequest(result.Error);
+            catch (InvalidOperationException)
+            {
+                return StatusCode(409);
+            }
+            
+            return Created();
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthViewModel model)
+        public async Task<IActionResult> Login([FromBody] AuthUserDto model)
         {
-            var user = new AuthUserDTO
+            var user = new AuthUserDto
             {
-                Email = model.Login,
+                Login = model.Login,
                 Password = model.Password
             };
-            var token = await _userService.LoginUserAsync(user);
-            if (token.IsSuccess)
-            {
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddMonths(6)
-                };
 
-                Response.Cookies.Append("AppCookie", token.Value, cookieOptions);
-                return Ok();
+            var token = await _userService.LoginUserAsync(user);
+
+            if (token == null)
+            {
+                return StatusCode(409);
             }
+<<<<<<< HEAD
             return Unauthorized();
+=======
+            
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsHttps,
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddMonths(6)
+            };
+
+            Response.Cookies.Append("AppCookie", token, cookieOptions);
+            return Ok();
+>>>>>>> 061ff09db845020465bc2645cbceecd27087d3ec
         }
 
         [HttpPost("logout")]

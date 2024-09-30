@@ -1,14 +1,21 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.API;
+using Web.Application.DTO_s;
+using Web.Application.DTO_s.Message;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
+using Web.Application.Validators.Message;
+using Web.Application.Validators.User;
 using Web.Core.IRepositories;
 using Web.Infrastructure;
 using Web.Persistence;
 using Web.Persistence.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,16 +61,22 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+builder.Services.AddScoped<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IValidator<SendMessageDto>, SendMessageDtoValidator>();
+builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
+builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

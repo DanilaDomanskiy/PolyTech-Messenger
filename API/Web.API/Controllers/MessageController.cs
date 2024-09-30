@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Web.Application.DTO_s.Message;
+using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API.Controllers
@@ -15,57 +16,62 @@ namespace Web.API.Controllers
         private readonly IHubContext<ChatHub> _chatHub;
         private readonly IUserService _userService;
         private readonly IPrivateChatService _privateChatService;
+        private readonly IEncryptionService _encryptionService;
 
         public MessageController(
             IMessageService messageService,
             IHubContext<ChatHub> chatHub,
             IUserService userService,
-            IPrivateChatService privateChatService)
+            IPrivateChatService privateChatService,
+            IEncryptionService encryptionService)
         {
             _messageService = messageService;
             _chatHub = chatHub;
             _userService = userService;
             _privateChatService = privateChatService;
+            _encryptionService = encryptionService;
         }
 
-        [HttpGet("byChatId/{chatId}")]
+        [HttpGet("byChatId{chatId}")]
         public async Task<IActionResult> GetMessagesByChatId(int chatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var isUserExist = await _privateChatService.IsUserExistInChat(userId, chatId);
+            var isUserExist = await _privateChatService.IsUserExistInChatAsync(userId, chatId);
 
             if (!isUserExist)
             { 
                 return Unauthorized();
             }
-            var messages = await _messageService.GetMessagesByChatIdAsync(chatId);
-            return Ok(messages.Select(message => new ReadMessageViewModel
+
+            var messages = await _messageService.GetMessagesByChatIdAsync(chatId, userId);
+
+            var encryptedMessages = messages.Select(message =>
             {
-                Content = message.Content,
-                SenderName = message.SenderName,
-                Timestamp = message.Timestamp,
-                IsSender = message.SenderId == userId
-            }));
+                message.Content = _encryptionService.Decrypt(message.Content);
+                return message;
+            }).ToList();
+
+            return Ok(encryptedMessages);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMassege([FromBody] SendMessageViewModel model)
+        public async Task<IActionResult> SendMassege([FromBody] SendMessageDto model)
         {
             var senderId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var user = await _userService.GetUserAsync(senderId);
+            var userName = await _userService.GetUserNameAsync(senderId);
 
-            if (user == null)
+            if (userName == null)
             {
                 return Unauthorized();
             }
 
-            await _chatHub.Clients
-                .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
-                .SendAsync("ReceiveMessage", user.Name, model.Content, model.Timestamp);
+            //await _chatHub.Clients
+            //    .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
+            //    .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
 
-            var message = new SaveMessageDTO
+            var message = new SaveMessageDto
             {
-                Content = model.Content,
+                Content = _encryptionService.Encrypt(model.Content),
                 SenderId = senderId,
                 Timestamp = model.Timestamp,
                 GroupId = model?.GroupId,

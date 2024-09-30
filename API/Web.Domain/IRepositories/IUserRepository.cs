@@ -1,12 +1,10 @@
 ﻿using Web.Core.Entites;
 
-namespace Web.Persistence.Repositories
+namespace Web.Core.IRepositories
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepository<User>
     {
-        Task AddUserAsync(User user);
-        Task<bool> IsUserExists(string email);
+        Task<bool> IsUserExistsAsync(string email);
         Task<User?> ReadAsyncByEmail(string email);
-        Task<User?> ReadAsyncById(int id);
     }
 }

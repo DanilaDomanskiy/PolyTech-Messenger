@@ -4,7 +4,7 @@ namespace Web.Application.Interfaces.IServices
 {
     public interface IMessageService
     {
-        Task<IEnumerable<ReadMessageDTO>> GetMessagesByChatIdAsync(int chatId);
-        Task SaveMessageAsync(SaveMessageDTO saveMessageDTO);
+        Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId);
+        Task SaveMessageAsync(SaveMessageDto saveMessageDTO);
     }
 }

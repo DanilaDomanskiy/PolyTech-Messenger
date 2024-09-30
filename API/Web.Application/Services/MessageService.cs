@@ -1,7 +1,7 @@
 ﻿using Web.Application.DTO_s.Message;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
-using Web.Persistence.Repositories;
+using Web.Core.IRepositories;
 
 namespace Web.Application.Services
 {
@@ -14,29 +14,30 @@ namespace Web.Application.Services
             _messageRepository = messageRepository;
         }
 
-        public async Task SaveMessageAsync(SaveMessageDTO saveMessageDTO)
+        public async Task SaveMessageAsync(SaveMessageDto saveMessageDTO)
         {
             var message = new Message
             {
                 Content = saveMessageDTO.Content,
                 Timestamp = saveMessageDTO.Timestamp,
-                SenderId = saveMessageDTO.SenderId,
+                SenderId = saveMessageDTO.SenderId, 
                 GroupId = saveMessageDTO?.GroupId,
                 PrivateChatId = saveMessageDTO?.PrivateChatId
             };
 
-            await _messageRepository.SaveMessageAsync(message);
+            await _messageRepository.CreateAsync(message);
         }
 
-        public async Task<IEnumerable<ReadMessageDTO>> GetMessagesByChatIdAsync(int chatId)
+        public async Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId)
         {
             var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
-            return messages.Select(message => new ReadMessageDTO
+            return messages.Select(message => new ReadMessageDto
             {
                 Content = message.Content,
                 Timestamp = message.Timestamp,
                 SenderName = message.Sender.Name,
-                SenderId = message.Sender.Id
+                SenderId = message.Sender.Id,
+                IsSender = message.SenderId == userId
             });
         }
     }

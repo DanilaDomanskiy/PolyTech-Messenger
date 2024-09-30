@@ -17,8 +17,7 @@ namespace Web.Persistence.Configurations
 
             builder
                 .Property(u => u.Email)
-                .IsRequired()
-                .HasMaxLength(100);
+                .IsRequired();
 
             builder
                 .Property(u => u.PasswordHash)
