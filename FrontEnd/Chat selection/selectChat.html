@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PolyTech Messenger - Сообщения</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Поле для поиска с кнопкой -->
+      <div class="search-container">
+        <input
+          type="text"
+          id="search"
+          placeholder="Поиск..."
+          class="search-input"
+        />
+        <img src="src/search.png" alt="Поиск" class="search-icon" />
+      </div>
+
+      <!-- Контейнер для отображения контента -->
+      <div id="content">
+        <!-- Личные сообщения по умолчанию -->
+        <div id="privateMessages">
+          <h2 class="title">Чаты</h2>
+          <p>Здесь будут отображаться ваши чаты.</p>
+        </div>
+
+        <!-- Групповые сообщения (скрыто по умолчанию) -->
+        <div id="groupMessages" style="display: none">
+          <h2 class="title">Группы</h2>
+          <p>Здесь будут отображаться ваши групповые сообщения.</p>
+        </div>
+      </div>
+
+      <!-- Кнопки для выбора личных сообщений и групп -->
+      <div class="button-container">
+        <button id="privateBtn" class="button active">Чаты</button>
+        <button id="groupBtn" class="button">Группы</button>
+      </div>
+    </div>
+
+    <script src="JavaScript.js"></script>
+  </body>
+</html>

@@ -27,7 +27,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             throw new Error('Ошибка авторизации');
         }
         
+        alert("Вход выполнен!");
         //перейти дальше
+        window.location.href = "/Chat selection/selectChat.html";
     })
     .catch(error => {
         console.error(error);

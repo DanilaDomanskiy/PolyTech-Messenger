@@ -1,0 +1,115 @@
+/* Основные стили */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    /* Градиент */
+    background: linear-gradient(135deg, #d4eac7, #2c804c);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+    min-height: calc(100vh - 20px); /* Учёт отступов в вычислениях */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Стили для контейнера поиска */
+.search-container {
+    position: relative; /* Для позиционирования иконки внутри поля */
+    width: 100%;
+}
+
+/* Стили для поля поиска */
+.search-input {
+    width: 80%; /* Уменьшена ширина */
+    padding: 8px 35px 8px 40px; /* Увеличиваем внутренние отступы слева для иконки */
+    margin: 0 auto 15px auto; /* Центрируем элемент по горизонтали */
+    border: 1px solid #ccc;
+    border-radius: 15px; /* Радиус уменьшен */
+    font-size: 14px; /* Уменьшен размер шрифта */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: #2c804c;
+    box-shadow: 0 0 5px rgba(44, 128, 76, 0.5);
+}
+
+/* Стили для значка поиска */
+.search-icon {
+    position: absolute; /* Позиционируем иконку относительно родителя */
+    left: 75px; /* Отступ от левого края */
+    top: 18px; /* Центрируем по вертикали */
+    transform: translateY(-50%); /* Центрируем по вертикали */
+    width: 20px; /* Ширина иконки */
+    height: 20px; /* Высота иконки */
+}
+
+.search-icon:hover {
+    cursor: pointer;
+}
+
+/* Стили для кнопок */
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.button {
+    flex: 1;
+    padding: 12px 0;
+    border: 1px solid #ddd;
+    background-color: #f4f4f4;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 10px;
+}
+
+.button.active {
+    background-color: #2c804c;
+    color: white;
+}
+
+.button:hover {
+    background-color: #23713d;
+    color: white;
+}
+
+/* Стили для контента */
+#content {
+    text-align: left;
+    flex-grow: 1;
+}
+
+.title {
+    font-size: 22px;
+    color: #2c804c;
+    margin-bottom: 10px;
+}
+
+#content p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+}
