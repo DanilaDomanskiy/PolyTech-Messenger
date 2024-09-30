@@ -52,9 +52,6 @@ namespace Web.API.Controllers
             {
                 return StatusCode(409);
             }
-<<<<<<< HEAD
-            return Unauthorized();
-=======
             
             var cookieOptions = new CookieOptions
             {
@@ -66,7 +63,6 @@ namespace Web.API.Controllers
 
             Response.Cookies.Append("AppCookie", token, cookieOptions);
             return Ok();
->>>>>>> 061ff09db845020465bc2645cbceecd27087d3ec
         }
 
         [HttpPost("logout")]
