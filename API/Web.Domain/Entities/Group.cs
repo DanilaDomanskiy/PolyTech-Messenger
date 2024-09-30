@@ -1,6 +1,8 @@
-﻿namespace Web.Core.Entites
+﻿using Web.Core.Entities;
+
+namespace Web.Core.Entites
 {
-    public class Group
+    public class Group : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

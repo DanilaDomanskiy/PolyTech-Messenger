@@ -8,8 +8,7 @@ namespace Web.Application.Validators.User
         public AuthUserDtoValidator()
         {
             RuleFor(x => x.Login)
-                .NotEmpty()
-                .EmailAddress();
+                .NotEmpty();
 
             RuleFor(x => x.Password)
                 .NotEmpty();

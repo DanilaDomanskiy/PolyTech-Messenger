@@ -31,7 +31,7 @@ namespace Web.Application.Services
         
         public async Task<PrivateChatUsersDto?> GetChatUsersAsync(int id)
         {
-            var chat = await _privateChatRepository.GetChatAsync(id);
+            var chat = await _privateChatRepository.ReadAsync(id);
 
             if (chat == null)
             {
@@ -57,7 +57,7 @@ namespace Web.Application.Services
 
         public async Task<bool> IsUserExistInChatAsync(int userId, int privateChatId)
         {
-            var privateChat = await _privateChatRepository.GetChatAsync(privateChatId);
+            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
 
             return privateChat == null ? false : 
                 privateChat.User1Id == userId || 
@@ -66,7 +66,7 @@ namespace Web.Application.Services
 
         public async Task<string?> GetOtherUserNameAsync(int userId, int privateChatId)
         {
-            var privateChat = await _privateChatRepository.GetChatAsync(privateChatId);
+            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
             return privateChat == null ? null 
                 : privateChat.User1Id == userId 
                 ? privateChat.User2.Name

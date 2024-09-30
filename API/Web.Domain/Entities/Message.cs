@@ -1,6 +1,8 @@
-﻿namespace Web.Core.Entites
+﻿using Web.Core.Entities;
+
+namespace Web.Core.Entites
 {
-    public class Message
+    public class Message : IEntity
     {
         public int Id { get; set; }
         public string Content { get; set; }

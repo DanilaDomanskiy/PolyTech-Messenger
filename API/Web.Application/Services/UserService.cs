@@ -54,7 +54,7 @@ namespace Web.Application.Services
 
         public async Task<string?> GetUserNameAsync(int id)
         {
-            var user = await _userRepository.ReadAsyncById(id);
+            var user = await _userRepository.ReadAsync(id);
 
             if (user == null)
             {

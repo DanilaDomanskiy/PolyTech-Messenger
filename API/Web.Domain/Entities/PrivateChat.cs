@@ -1,6 +1,8 @@
-﻿namespace Web.Core.Entites
+﻿using Web.Core.Entities;
+
+namespace Web.Core.Entites
 {
-    public class PrivateChat
+    public class PrivateChat : IEntity
     {
         public int Id { get; set; }
         public int User1Id { get; set; }
