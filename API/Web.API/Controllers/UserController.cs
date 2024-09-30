@@ -56,7 +56,7 @@ namespace Web.API.Controllers
                 Response.Cookies.Append("AppCookie", token.Value, cookieOptions);
                 return Ok();
             }
-            return BadRequest(token.Error);
+            return Unauthorized();
         }
 
         [HttpPost("logout")]
