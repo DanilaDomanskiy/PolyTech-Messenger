@@ -10,7 +10,7 @@ namespace Web.Persistence.Repositories
         {
         }
 
-        public async Task<PrivateChat?> GetChatAsync(int id)
+        public override async Task<PrivateChat?> ReadAsync(int id)
         {
             return await _context.PrivateChats
                 .AsNoTracking()

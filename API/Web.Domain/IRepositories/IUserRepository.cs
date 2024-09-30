@@ -6,6 +6,5 @@ namespace Web.Core.IRepositories
     {
         Task<bool> IsUserExistsAsync(string email);
         Task<User?> ReadAsyncByEmail(string email);
-        Task<User?> ReadAsyncById(int id);
     }
 }
