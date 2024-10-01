@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.API;
+using Web.Application;
 using Web.Application.DTO_s;
 using Web.Application.DTO_s.Message;
 using Web.Application.Interfaces;
@@ -52,7 +53,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://localhost:1234", "https://localhost:7205")
+        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials();
@@ -80,6 +81,8 @@ builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 

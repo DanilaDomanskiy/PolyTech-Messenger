@@ -1,4 +1,6 @@
-﻿using Web.Application.DTO_s.Message;
+﻿using AutoMapper;
+using Web.Application.DTO_s.Message;
+using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
 using Web.Core.IRepositories;
@@ -8,37 +10,38 @@ namespace Web.Application.Services
     public class MessageService : IMessageService
     {
         private readonly IMessageRepository _messageRepository;
+        private readonly IEncryptionService _encryptionService;
+        private readonly IMapper _mapper;
 
-        public MessageService(IMessageRepository messageRepository)
+        public MessageService(
+            IMessageRepository messageRepository, 
+            IMapper mapper, 
+            IEncryptionService encryptionService)
         {
             _messageRepository = messageRepository;
+            _mapper = mapper;
+            _encryptionService = encryptionService;
         }
 
         public async Task SaveMessageAsync(SaveMessageDto saveMessageDTO)
         {
-            var message = new Message
-            {
-                Content = saveMessageDTO.Content,
-                Timestamp = saveMessageDTO.Timestamp,
-                SenderId = saveMessageDTO.SenderId, 
-                GroupId = saveMessageDTO?.GroupId,
-                PrivateChatId = saveMessageDTO?.PrivateChatId
-            };
-
+            var message = _mapper.Map<Message>(saveMessageDTO);
             await _messageRepository.CreateAsync(message);
         }
 
         public async Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId)
         {
             var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
-            return messages.Select(message => new ReadMessageDto
-            {
-                Content = message.Content,
-                Timestamp = message.Timestamp,
-                SenderName = message.Sender.Name,
-                SenderId = message.Sender.Id,
-                IsSender = message.SenderId == userId
-            });
+
+            var readMessages = _mapper.Map<IEnumerable<ReadMessageDto>>(messages)
+                .Select(message =>
+                {
+                    message.Content = _encryptionService.Decrypt(message.Content);
+                    message.IsSender = message.SenderId == userId;
+                    return message;
+                });
+
+            return readMessages;
         }
     }
 }

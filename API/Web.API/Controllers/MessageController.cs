@@ -45,13 +45,7 @@ namespace Web.API.Controllers
 
             var messages = await _messageService.GetMessagesByChatIdAsync(chatId, userId);
 
-            var encryptedMessages = messages.Select(message =>
-            {
-                message.Content = _encryptionService.Decrypt(message.Content);
-                return message;
-            }).ToList();
-
-            return Ok(encryptedMessages);
+            return Ok(messages);
         }
 
         [HttpPost]
@@ -65,17 +59,33 @@ namespace Web.API.Controllers
                 return Unauthorized();
             }
 
-            //await _chatHub.Clients
-            //    .GroupExcept("pc" + model.PrivateChatId.ToString(), model.ConnectionId)
-            //    .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
+            if (model.PrivateChatId.HasValue)
+            {
+                var privateChatUsers = await _privateChatService.GetChatUsersAsync(model.PrivateChatId.Value);
+
+                if (privateChatUsers == null ||
+                    (privateChatUsers.User1Id != senderId && 
+                    privateChatUsers.User2Id != senderId))
+                {
+                    return Unauthorized();
+                }
+
+                // await _chatHub.Clients
+                //    .GroupExcept("pc" + model.PrivateChatId.Value, model.ConnectionId)
+                //    .SendAsync("ReceiveMessage", userName, model.Content, model.Timestamp);
+            }
+            else if (model.GroupId.HasValue)
+            {
+                throw new NotImplementedException();
+            }
 
             var message = new SaveMessageDto
             {
                 Content = _encryptionService.Encrypt(model.Content),
                 SenderId = senderId,
                 Timestamp = model.Timestamp,
-                GroupId = model?.GroupId,
-                PrivateChatId = model?.PrivateChatId
+                GroupId = model.GroupId,
+                PrivateChatId = model.PrivateChatId
             };
 
             await _messageService.SaveMessageAsync(message);

@@ -1,4 +1,6 @@
-﻿using Web.Application.DTO_s;
+﻿using AutoMapper;
+using Web.Application.Dto_s.User;
+using Web.Application.DTO_s;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
@@ -11,17 +13,20 @@ namespace Web.Application.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUserRepository _userRepository;
         private readonly IJwtProvider _jwtProvider;
+        private readonly IMapper _mapper;
 
         public UserService(
             IPasswordHasher passwordHasher,
             IUserRepository userRepository,
-            IJwtProvider jwtProvider)
+            IJwtProvider jwtProvider,
+            IMapper mapper)
         {
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
             _jwtProvider = jwtProvider;
+            _mapper = mapper;
         }
-        
+
         public async Task RegisterUserAsync(RegisterUserDto userDTO)
         {
             var isUserExists = await _userRepository.IsUserExistsAsync(userDTO.Email);
@@ -29,12 +34,9 @@ namespace Web.Application.Services
             {
                 throw new InvalidOperationException();
             }
-            var user = new User
-            {
-                Name = userDTO.Name,
-                Email = userDTO.Email,
-                PasswordHash = _passwordHasher.Generate(userDTO.Password)
-            };
+
+            var user = _mapper.Map<User>(userDTO);
+            user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
             await _userRepository.CreateAsync(user);
         }
 
@@ -56,12 +58,7 @@ namespace Web.Application.Services
         {
             var user = await _userRepository.ReadAsync(id);
 
-            if (user == null)
-            {
-                return null;
-            }
-
-            return user.Name;
+            return user?.Name ?? null;
         }
     }
 }

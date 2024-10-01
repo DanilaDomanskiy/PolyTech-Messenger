@@ -1,4 +1,5 @@
-﻿using Web.Application.DTO_s.PrivateChat;
+﻿using AutoMapper;
+using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
 using Web.Core.IRepositories;
@@ -8,16 +9,19 @@ namespace Web.Application.Services
     public class PrivateChatService : IPrivateChatService
     {
         private readonly IPrivateChatRepository _privateChatRepository;
+        private readonly IMapper _mapper;
 
-        public PrivateChatService(IPrivateChatRepository privateChatRepository)
+        public PrivateChatService(IPrivateChatRepository privateChatRepository, IMapper mapper)
         {
             _privateChatRepository = privateChatRepository;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
-            return chats.Select(chat =>
+
+            var privateChatUser = chats.Select(chat =>
             {
                 var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
 
@@ -27,31 +31,19 @@ namespace Web.Application.Services
                     SecondUserName = otherUser.Name
                 };
             });
+
+            return privateChatUser;
         }
-        
+
         public async Task<PrivateChatUsersDto?> GetChatUsersAsync(int id)
         {
             var chat = await _privateChatRepository.ReadAsync(id);
-
-            if (chat == null)
-            {
-                return null;
-            }
-
-            return new PrivateChatUsersDto
-            { 
-                User1Id = chat.User1Id,
-                User2Id = chat.User2Id
-            };
+            return chat == null ? null : _mapper.Map<PrivateChatUsersDto>(chat);
         }
 
         public async Task CreateChatAsync(PrivateChatUsersDto model)
         {
-            var privateChat = new PrivateChat
-            {
-                User1Id = model.User1Id,
-                User2Id = model.User2Id
-            };
+            var privateChat = _mapper.Map<PrivateChat>(model);
             await _privateChatRepository.CreateAsync(privateChat);
         }
 
@@ -67,12 +59,23 @@ namespace Web.Application.Services
         public async Task<string?> GetOtherUserNameAsync(int userId, int privateChatId)
         {
             var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
-            return privateChat == null ? null 
-                : privateChat.User1Id == userId 
-                ? privateChat.User2.Name
-                : privateChat.User2Id == userId
-                ? privateChat.User1.Name 
-                : null;
+
+            if (privateChat == null)
+            {
+                return null;
+            }
+
+            if (privateChat.User1Id == userId)
+            {
+                return privateChat.User2.Name;
+            }
+
+            if (privateChat.User2Id == userId)
+            {
+                return privateChat.User1.Name;
+            }
+
+            return null;
         }
     }
 }
