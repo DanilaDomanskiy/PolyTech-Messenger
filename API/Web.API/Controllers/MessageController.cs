@@ -16,7 +16,6 @@ namespace Web.API.Controllers
         private readonly IHubContext<ChatHub> _chatHub;
         private readonly IUserService _userService;
         private readonly IPrivateChatService _privateChatService;
-        private readonly IEncryptionService _encryptionService;
 
         public MessageController(
             IMessageService messageService,
@@ -29,7 +28,6 @@ namespace Web.API.Controllers
             _chatHub = chatHub;
             _userService = userService;
             _privateChatService = privateChatService;
-            _encryptionService = encryptionService;
         }
 
         [HttpGet("byChatId{chatId}")]
@@ -81,7 +79,7 @@ namespace Web.API.Controllers
 
             var message = new SaveMessageDto
             {
-                Content = _encryptionService.Encrypt(model.Content),
+                Content = model.Content,
                 SenderId = senderId,
                 Timestamp = model.Timestamp,
                 GroupId = model.GroupId,

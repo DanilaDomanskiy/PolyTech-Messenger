@@ -26,6 +26,7 @@ namespace Web.Application.Services
         public async Task SaveMessageAsync(SaveMessageDto saveMessageDTO)
         {
             var message = _mapper.Map<Message>(saveMessageDTO);
+            message.Content = _encryptionService.Encrypt(message.Content);
             await _messageRepository.CreateAsync(message);
         }
 
