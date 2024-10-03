@@ -1,9 +1,9 @@
 ﻿namespace Web.Application.DTO_s.User
 {
-    public class RegisterUserDto
+    public class SearchUserDto
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
     }
 }

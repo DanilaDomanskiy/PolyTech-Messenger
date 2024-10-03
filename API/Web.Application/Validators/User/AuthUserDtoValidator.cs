@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Web.Application.DTO_s;
+using Web.Application.DTO_s.User;
 
 namespace Web.Application.Validators.User
 {

@@ -21,5 +21,12 @@ namespace Web.Persistence.Repositories
         {
             return await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email);
         }
+
+        public async Task<IEnumerable<User>> ReadAsyncByEmailLetters(string email)
+        {
+            return await _context.Users
+                .Where(u => u.Email.Contains(email))
+                .ToListAsync();
+        }
     }
 }

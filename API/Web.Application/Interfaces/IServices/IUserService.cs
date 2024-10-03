@@ -1,4 +1,4 @@
-﻿using Web.Application.DTO_s;
+﻿using Web.Application.DTO_s.User;
 
 namespace Web.Application.Interfaces.IServices
 {
@@ -7,5 +7,6 @@ namespace Web.Application.Interfaces.IServices
         Task<string?> GetUserNameAsync(int id);
         Task<string?> LoginUserAsync(AuthUserDto userDTO);
         Task RegisterUserAsync(RegisterUserDto userDTO);
+        Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email);
     }
 }

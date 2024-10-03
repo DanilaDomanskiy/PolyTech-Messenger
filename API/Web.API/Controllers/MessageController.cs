@@ -8,7 +8,7 @@ using Web.Application.Interfaces.IServices;
 namespace Web.API.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/message")]
     [ApiController]
     public class MessageController : ControllerBase
     {

@@ -6,7 +6,7 @@ using Web.Application.Interfaces.IServices;
 namespace Web.API.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/privateChat")]
     [ApiController]
     public class PrivateChatController : ControllerBase
     {

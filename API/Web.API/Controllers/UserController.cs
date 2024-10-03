@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web.Application.DTO_s;
+using Web.Application.DTO_s.User;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -33,7 +33,7 @@ namespace Web.API.Controllers
             {
                 return StatusCode(409);
             }
-            
+
             return Created();
         }
 
@@ -52,7 +52,7 @@ namespace Web.API.Controllers
             {
                 return StatusCode(409);
             }
-            
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -74,6 +74,14 @@ namespace Web.API.Controllers
             }
 
             return Ok();
+        }
+
+        //[Authorize]
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsersByEmail(string email)
+        {
+            var users = await _userService.SearchByEmailAsync(email);
+            return Ok(users);
         }
     }
 }

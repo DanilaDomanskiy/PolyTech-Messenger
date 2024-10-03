@@ -1,4 +1,4 @@
-﻿namespace Web.Application.DTO_s
+﻿namespace Web.Application.DTO_s.User
 {
     public class AuthUserDto
     {

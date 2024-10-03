@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using Web.Application.Dto_s.User;
-using Web.Application.DTO_s;
+using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entites;
@@ -57,8 +56,13 @@ namespace Web.Application.Services
         public async Task<string?> GetUserNameAsync(int id)
         {
             var user = await _userRepository.ReadAsync(id);
-
             return user?.Name ?? null;
+        }
+
+        public async Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email)
+        {
+            var users = await _userRepository.ReadAsyncByEmailLetters(email);
+            return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
     }
 }

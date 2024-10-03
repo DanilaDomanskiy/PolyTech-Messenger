@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Web.Application.DTO_s;
 using Web.Application.DTO_s.Message;
 using Web.Application.DTO_s.PrivateChat;
+using Web.Application.DTO_s.User;
 using Web.Core.Entites;
 
 namespace Web.Application
@@ -20,6 +20,8 @@ namespace Web.Application
             CreateMap<PrivateChatUsersDto, PrivateChat>();
 
             CreateMap<PrivateChat, PrivateChatUsersDto>();
+
+            CreateMap<User, SearchUserDto>();
         }
     }
 }
