@@ -1,6 +1,7 @@
 import React from "react";
 import Login from "./pages/Login/Login";
 import Registration from "./pages/Registration/Registration";
+import SelectChat from "./pages/SelectChat/SelectChat";
 import { Routes, Route } from "react-router-dom";
 import "./styles/Global.css";
 
