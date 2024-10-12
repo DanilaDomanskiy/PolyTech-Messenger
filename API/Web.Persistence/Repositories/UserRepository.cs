@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Persistence.Repositories

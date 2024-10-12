@@ -1,6 +1,4 @@
-﻿using Web.Core.Entities;
-
-namespace Web.Core.Entites
+﻿namespace Web.Core.Entities
 {
     public class User : IEntity
     {
@@ -8,6 +6,7 @@ namespace Web.Core.Entites
         public string Name { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
+        public string ProfilePicturePath { get; set; }
         public ICollection<Message> SentMessages { get; set; }
         public ICollection<Group> Groups { get; set; }
         public ICollection<PrivateChat> PrivateChatsAsUser1 { get; set; }

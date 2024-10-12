@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Web.Core.Entites;
+using Web.Core.Entities;
 
 namespace Web.Persistence.Configurations
 {
@@ -21,6 +21,11 @@ namespace Web.Persistence.Configurations
 
             builder
                 .Property(u => u.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            builder
+                .Property(u => u.ProfilePicturePath)
                 .IsRequired()
                 .HasMaxLength(100);
 

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Web.Application.DTO_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -51,8 +51,8 @@ namespace Web.Application.Services
         {
             var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
 
-            return privateChat == null ? false : 
-                privateChat.User1Id == userId || 
+            return privateChat == null ? false :
+                privateChat.User1Id == userId ||
                 privateChat.User2Id == userId;
         }
 
