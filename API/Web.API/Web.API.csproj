@@ -23,7 +23,7 @@
     <ProjectReference Include="..\Web.Application\Web.Application.csproj" />
     <ProjectReference Include="..\Web.Domain\Web.Core.csproj" />
     <ProjectReference Include="..\Web.Infrastructure\Web.Infrastructure.csproj" />
-    <ProjectReference Include="..\Web.Persistance\Web.Persistence.csproj" />
+    <ProjectReference Include="..\Web.Persistence\Web.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

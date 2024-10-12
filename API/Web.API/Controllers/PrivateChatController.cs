@@ -38,7 +38,7 @@ namespace Web.API.Controllers
             return Created();
         }
 
-        [HttpGet("chatName{privateChatId}")]
+        [HttpGet("chatName/{privateChatId}")]
         public async Task<IActionResult> GetUserName(int privateChatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);

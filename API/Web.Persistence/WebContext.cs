@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Persistence.Configurations;
 
 namespace Web.Persistence
@@ -18,6 +18,7 @@ namespace Web.Persistence
         public DbSet<Group> Groups { get; set; }
         public DbSet<PrivateChat> PrivateChats { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<MessageFile> MessagesFile { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -31,6 +32,7 @@ namespace Web.Persistence
             modelBuilder.ApplyConfiguration(new GroupConfiguration());
             modelBuilder.ApplyConfiguration(new PrivateChatConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageFileConfiguration());
         }
     }
 }

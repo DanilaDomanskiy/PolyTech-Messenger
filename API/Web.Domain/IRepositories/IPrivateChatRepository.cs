@@ -1,4 +1,4 @@
-﻿using Web.Core.Entites;
+﻿using Web.Core.Entities;
 
 namespace Web.Core.IRepositories
 {

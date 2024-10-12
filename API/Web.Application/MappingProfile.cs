@@ -2,7 +2,7 @@
 using Web.Application.DTO_s.Message;
 using Web.Application.DTO_s.PrivateChat;
 using Web.Application.DTO_s.User;
-using Web.Core.Entites;
+using Web.Core.Entities;
 
 namespace Web.Application
 {

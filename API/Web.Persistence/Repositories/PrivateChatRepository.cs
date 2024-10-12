@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Persistence.Repositories
@@ -16,7 +16,7 @@ namespace Web.Persistence.Repositories
                 .AsNoTracking()
                 .Include(chat => chat.User1)
                 .Include(chat => chat.User2)
-                .FirstOrDefaultAsync(chat => chat.Id == id); 
+                .FirstOrDefaultAsync(chat => chat.Id == id);
         }
 
         public async Task<IEnumerable<PrivateChat>> GetChatsAsync(int userId)

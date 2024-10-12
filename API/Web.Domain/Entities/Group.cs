@@ -1,6 +1,4 @@
-﻿using Web.Core.Entities;
-
-namespace Web.Core.Entites
+﻿namespace Web.Core.Entities
 {
     public class Group : IEntity
     {

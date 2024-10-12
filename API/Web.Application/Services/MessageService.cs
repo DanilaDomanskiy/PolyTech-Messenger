@@ -2,7 +2,7 @@
 using Web.Application.DTO_s.Message;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -14,8 +14,8 @@ namespace Web.Application.Services
         private readonly IMapper _mapper;
 
         public MessageService(
-            IMessageRepository messageRepository, 
-            IMapper mapper, 
+            IMessageRepository messageRepository,
+            IMapper mapper,
             IEncryptionService encryptionService)
         {
             _messageRepository = messageRepository;

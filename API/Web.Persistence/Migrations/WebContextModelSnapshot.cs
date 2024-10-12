@@ -37,7 +37,7 @@ namespace Web.Persistence.Migrations
                     b.ToTable("GroupUser");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.Group", b =>
+            modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +60,7 @@ namespace Web.Persistence.Migrations
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.Message", b =>
+            modelBuilder.Entity("Web.Core.Entities.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,6 +72,9 @@ namespace Web.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FileId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("GroupId")
                         .HasColumnType("int");
@@ -96,7 +99,36 @@ namespace Web.Persistence.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.PrivateChat", b =>
+            modelBuilder.Entity("Web.Core.Entities.MessageFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageId")
+                        .IsUnique();
+
+                    b.ToTable("MessagesFile");
+                });
+
+            modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,7 +151,7 @@ namespace Web.Persistence.Migrations
                     b.ToTable("PrivateChats");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.User", b =>
+            modelBuilder.Entity("Web.Core.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,6 +173,11 @@ namespace Web.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("ProfilePicturePath")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -148,22 +185,22 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("GroupUser", b =>
                 {
-                    b.HasOne("Web.Core.Entites.Group", null)
+                    b.HasOne("Web.Core.Entities.Group", null)
                         .WithMany()
                         .HasForeignKey("GroupsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Web.Core.Entites.User", null)
+                    b.HasOne("Web.Core.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.Group", b =>
+            modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
-                    b.HasOne("Web.Core.Entites.User", "Creator")
+                    b.HasOne("Web.Core.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -172,19 +209,19 @@ namespace Web.Persistence.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.Message", b =>
+            modelBuilder.Entity("Web.Core.Entities.Message", b =>
                 {
-                    b.HasOne("Web.Core.Entites.Group", "Group")
+                    b.HasOne("Web.Core.Entities.Group", "Group")
                         .WithMany("Messages")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Web.Core.Entites.PrivateChat", "PrivateChat")
+                    b.HasOne("Web.Core.Entities.PrivateChat", "PrivateChat")
                         .WithMany("Messages")
                         .HasForeignKey("PrivateChatId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Web.Core.Entites.User", "Sender")
+                    b.HasOne("Web.Core.Entities.User", "Sender")
                         .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -197,15 +234,26 @@ namespace Web.Persistence.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.PrivateChat", b =>
+            modelBuilder.Entity("Web.Core.Entities.MessageFile", b =>
                 {
-                    b.HasOne("Web.Core.Entites.User", "User1")
+                    b.HasOne("Web.Core.Entities.Message", "Message")
+                        .WithOne("File")
+                        .HasForeignKey("Web.Core.Entities.MessageFile", "MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+                });
+
+            modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
+                {
+                    b.HasOne("Web.Core.Entities.User", "User1")
                         .WithMany("PrivateChatsAsUser1")
                         .HasForeignKey("User1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Web.Core.Entites.User", "User2")
+                    b.HasOne("Web.Core.Entities.User", "User2")
                         .WithMany("PrivateChatsAsUser2")
                         .HasForeignKey("User2Id")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -216,17 +264,23 @@ namespace Web.Persistence.Migrations
                     b.Navigation("User2");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.Group", b =>
+            modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.PrivateChat", b =>
+            modelBuilder.Entity("Web.Core.Entities.Message", b =>
+                {
+                    b.Navigation("File")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
                 {
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("Web.Core.Entites.User", b =>
+            modelBuilder.Entity("Web.Core.Entities.User", b =>
                 {
                     b.Navigation("PrivateChatsAsUser1");
 

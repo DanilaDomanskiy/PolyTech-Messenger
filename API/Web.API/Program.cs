@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.API;
 using Web.Application;
-using Web.Application.DTO_s;
 using Web.Application.DTO_s.Message;
 using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
@@ -17,7 +16,6 @@ using Web.Core.IRepositories;
 using Web.Infrastructure;
 using Web.Persistence;
 using Web.Persistence.Repositories;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +52,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205")
+        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205", "https://assuring-properly-tahr.ngrok-free.app")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials();
@@ -64,20 +62,21 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IValidator<SendMessageDto>, SendMessageDtoValidator>();
+builder.Services.AddScoped<IValidator<SendPrivateChatMessageDto>, SendPrivateChatMessageDtoValidator>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
-
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddEndpointsApiExplorer();

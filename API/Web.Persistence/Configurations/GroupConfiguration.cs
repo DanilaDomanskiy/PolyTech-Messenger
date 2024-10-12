@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using Web.Core.Entites;
+﻿using Microsoft.EntityFrameworkCore;
+
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Web.Core.Entities;
 
 namespace Web.Persistence.Configurations
 {

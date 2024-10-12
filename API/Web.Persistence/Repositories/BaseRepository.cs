@@ -25,5 +25,15 @@ namespace Web.Persistence.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task UpdateAsync(Model model)
+        {
+            var existingModel = await _context.Set<Model>().FindAsync(model.Id);
+            if (existingModel != null)
+            {
+                _context.Entry(existingModel).CurrentValues.SetValues(model);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
-using Web.Core.Entites;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Web.Core.Entities;
 
 namespace Web.Persistence.Configurations
 {
@@ -35,6 +35,12 @@ namespace Web.Persistence.Configurations
                 .HasOne(m => m.PrivateChat)
                 .WithMany(pc => pc.Messages)
                 .HasForeignKey(m => m.PrivateChatId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasOne(m => m.File)
+                .WithOne(f => f.Message)
+                .HasForeignKey<MessageFile>(f => f.MessageId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
