@@ -1,40 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "./Button";
 
 const RegistrForm = () => {
   return (
     <form className="auth-form" id="registrform">
-      <div class="form-group">
+      <div className="form-group">
         <input
           type="text"
-          class="input name"
+          className="input name"
           name="name"
           placeholder="Введите имя..."
           required
-          minlength="2"
-          maxlength="100"
+          minLength="2"
+          maxLength="100"
         />
       </div>
-      <div class="form-group">
+      <div className="form-group">
         <input
           type="email"
-          class="input email"
+          className="input email"
           name="email"
           placeholder="Введите почту..."
           required
-          minlength="2"
-          maxlength="100"
+          minLength="2"
+          maxLength="100"
         />
       </div>
-      <div class="form-group">
+      <div className="form-group">
         <input
           type="password"
-          class="input password"
+          className="input password"
           name="password"
           placeholder="Введите пароль..."
           required
-          minlength="6"
-          maxlength="100"
+          minLength="10"
+          maxLength="100"
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{10,100}$"
+          title="Пароль должен содержать хотя бы одну заглавную букву, одну строчную букву, одну цифру и быть длиной от 10 до 100 символов."
         />
       </div>
       <div className="button-signUp">
