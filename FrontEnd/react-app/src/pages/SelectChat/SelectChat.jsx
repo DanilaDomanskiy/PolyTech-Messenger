@@ -6,6 +6,7 @@ import ButtonContainer from "../../components/SelectChat/ButtonContainer";
 
 const SelectChat = () => {
   const [activeSection, setActiveSection] = useState("private");
+
   return (
     <div className="container">
       <Search />
