@@ -8,7 +8,7 @@ const AuthForm = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate(); // Хук для навигации после успешной авторизации
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
