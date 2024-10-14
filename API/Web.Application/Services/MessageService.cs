@@ -34,13 +34,13 @@ namespace Web.Application.Services
         {
             var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
 
-            var readMessages = _mapper.Map<IEnumerable<ReadMessageDto>>(messages)
-                .Select(message =>
-                {
-                    message.Content = _encryptionService.Decrypt(message.Content);
-                    message.IsSender = message.SenderId == userId;
-                    return message;
-                });
+            var readMessages = messages.Select(message =>
+            {
+                var readMessage = _mapper.Map<ReadMessageDto>(message);
+                readMessage.Content = _encryptionService.Decrypt(readMessage.Content);
+                readMessage.IsSender = readMessage.SenderId == userId;
+                return readMessage;
+            });
 
             return readMessages;
         }

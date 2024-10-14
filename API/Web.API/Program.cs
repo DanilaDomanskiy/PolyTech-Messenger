@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.API;
 using Web.Application;
+using Web.Application.Dto_s.User;
 using Web.Application.DTO_s.Message;
-using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
@@ -52,7 +52,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205", "https://assuring-properly-tahr.ngrok-free.app")
+        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205")
                      .AllowAnyHeader()
                      .AllowAnyMethod()
                      .AllowCredentials();
@@ -62,7 +62,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
-builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
@@ -91,6 +90,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.UseCors();

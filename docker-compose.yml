@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./API
+    ports:
+      - "7205:7205"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # ConnectionStrings__ConnectionString: "Server=sql-db;Database=Poly;User=sa;Password=YourPassword123!;TrustServerCertificate=True;"
+      # JwtOptions__SecretKey: "123456789987654321123456789987654321123456789987654321"
+      # JwtOptions__ExpiresMonths: 6
+      # EncryptionSettings__Key: "s8v9x/A?D(G+KbPe"
+      # FileStorageSettings__UploadFolderPath: "/app/UploadedFiles"
+      ASPNETCORE_URLS: "http://+:7205"
+    depends_on:
+      - sql-db
+    restart: always
+
+  sql-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql-db
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: YourPassword123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    restart: always
+
+volumes:
+  sql-data:
+    driver: local

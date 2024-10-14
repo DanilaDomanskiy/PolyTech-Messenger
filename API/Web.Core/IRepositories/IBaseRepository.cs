@@ -5,6 +5,7 @@
         Task CreateAsync(Model model);
 
         Task<Model?> ReadAsync(int id);
+
         Task UpdateAsync(Model model);
     }
 }

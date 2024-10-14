@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s.User;
-using Web.Application.DTO_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entities;
@@ -14,20 +13,17 @@ namespace Web.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly IJwtProvider _jwtProvider;
         private readonly IMapper _mapper;
-        private readonly IFileStorageService _fileStorageService;
 
         public UserService(
             IPasswordHasher passwordHasher,
             IUserRepository userRepository,
             IJwtProvider jwtProvider,
-            IMapper mapper,
-            IFileStorageService fileStorageService)
+            IMapper mapper)
         {
             _passwordHasher = passwordHasher;
             _userRepository = userRepository;
             _jwtProvider = jwtProvider;
             _mapper = mapper;
-            _fileStorageService = fileStorageService;
         }
 
         public async Task RegisterUserAsync(RegisterUserDto userDTO)
@@ -39,7 +35,7 @@ namespace Web.Application.Services
             }
 
             var user = _mapper.Map<User>(userDTO);
-            user.ProfilePicturePath = "profile-image/default.jpg";
+            user.ProfilePicturePath = "profile-image/default.png";
             user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
             await _userRepository.CreateAsync(user);
         }
@@ -70,12 +66,10 @@ namespace Web.Application.Services
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task UpdateProfileImageAsync(ProfileImageDto model)
+        public async Task UpdateProfileImageAsync(string filePath, int userId)
         {
-            var path = $"profile-images/{model.UserId}.{model.Extension}";
-            await _fileStorageService.SaveFileAsync(model.Content, path);
-            var user = await _userRepository.ReadAsync(model.UserId);
-            user.ProfilePicturePath = path;
+            var user = await _userRepository.ReadAsync(userId);
+            user.ProfilePicturePath = filePath;
             await _userRepository.UpdateAsync(user);
         }
     }

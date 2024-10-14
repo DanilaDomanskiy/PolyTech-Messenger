@@ -45,5 +45,13 @@ namespace Web.API.Controllers
             var userName = await _privateChatService.GetOtherUserNameAsync(userId, privateChatId);
             return userName == null ? Unauthorized() : Ok(userName);
         }
+
+        [HttpGet("profileImagePath/{privateChatId}")]
+        public async Task<IActionResult> GetUserProfileImagePath(int privateChatId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var userProfileImagePath = await _privateChatService.GetOtherUserProfileImagePathAsync(userId, privateChatId);
+            return userProfileImagePath == null ? Unauthorized() : Ok(userProfileImagePath);
+        }
     }
 }
