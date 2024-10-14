@@ -6,12 +6,11 @@ namespace Web.Application.Interfaces.IServices
     {
         Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId);
 
-        Task<PrivateChatUsersDto?> GetChatUsersAsync(int userId);
-
         Task CreateChatAsync(PrivateChatUsersDto model);
 
         Task<bool> IsUserExistInChatAsync(int userId, int privateChatId);
 
         Task<string?> GetOtherUserNameAsync(int userId, int privateChatId);
+        Task<string?> GetOtherUserProfileImagePathAsync(int userId, int privateChatId);
     }
 }

@@ -15,7 +15,6 @@ namespace Web.Persistence.Repositories
             return await _context.Messages
                 .AsNoTracking()
                 .Where(m => m.PrivateChatId == privateChatId)
-                .Include(m => m.Sender)
                 .ToListAsync();
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Application.Dto_s.User;
-using Web.Application.DTO_s.User;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API.Controllers
@@ -11,10 +10,12 @@ namespace Web.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly string _folderPath;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
+            _folderPath = configuration["FileStorageSettings:UploadFolderPath"];
         }
 
         [HttpPost]
@@ -88,28 +89,51 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("uploadProfileImage")]
-        public async Task<IActionResult> UploadProfileImage([FromForm] IFormFile file)
+        [HttpPut("updateProfileImage")]
+        public async Task<IActionResult> UpdateAvatar(IFormFile file)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
 
-            var profileImageDto = new ProfileImageDto
+            var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var validContentTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
+            var contentType = file.ContentType.ToLowerInvariant();
+
+            if (!validExtensions.Contains(extension) || !validContentTypes.Contains(contentType))
             {
-                Content = await ConvertToByteArray(file),
-                UserId = userId,
-                Extension = Path.GetExtension(file.FileName).TrimStart('.')
-            };
+                return StatusCode(409);
+            }
 
-            await _userService.UpdateProfileImageAsync(profileImageDto);
+            var oldFiles = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{userId}.*");
 
-            return Created();
+            foreach (var oldFile in oldFiles)
+            {
+                System.IO.File.Delete(oldFile);
+            }
+
+            var path = $"profile-images/{userId}{extension}";
+            var filePath = Path.Combine(_folderPath, path);
+
+            using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            await _userService.UpdateProfileImageAsync(path, userId);
+
+            return NoContent();
         }
 
-        private async Task<byte[]> ConvertToByteArray(IFormFile file)
+        [Authorize]
+        [HttpGet("getProfileImage")]
+        public async Task<IActionResult> GetProfileImage(string imagePath)
         {
-            using var memoryStream = new MemoryStream();
-            await file.CopyToAsync(memoryStream);
-            return memoryStream.ToArray();
+            var fileFullPath = Path.Combine(_folderPath, imagePath);
+            if (!System.IO.File.Exists(fileFullPath))
+            {
+                return NotFound();
+            }
+            return PhysicalFile(fileFullPath, "application/octet-stream");
         }
     }
 }

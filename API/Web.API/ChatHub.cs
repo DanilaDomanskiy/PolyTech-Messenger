@@ -34,9 +34,8 @@ namespace Web.API
 
             if (int.TryParse(userIdClaim, out int userId))
             {
-                var userName = await _userService.GetUserNameAsync(userId);
                 await Clients.GroupExcept("pc" + model.PrivateChatId, Context.ConnectionId)
-                    .SendAsync("ReceivePrivateChatMessage", userId, userName, model.Content, model.Timestamp);
+                    .SendAsync("ReceivePrivateChatMessage", userId, model.Content, model.Timestamp);
 
                 var message = new SaveMessageDto
                 {

@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /app
+COPY Web.API/Web.API.csproj ./Web.API/
+COPY Web.Application/Web.Application.csproj ./Web.Application/
+COPY Web.Core/Web.Core.csproj ./Web.Core/
+COPY Web.Persistence/Web.Persistence.csproj ./Web.Persistence/
+COPY Web.Infrastructure/Web.Infrastructure.csproj ./Web.Infrastructure/
+RUN dotnet restore Web.API/Web.API.csproj
+COPY . ./
+RUN dotnet publish Web.API/Web.API.csproj -c Release -o /app/out
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build-env /app/out .
+ENTRYPOINT ["dotnet", "Web.API.dll"]

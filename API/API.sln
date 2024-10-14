@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Application", "Web.Appl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Infrastructure", "Web.Infrastructure\Web.Infrastructure.csproj", "{BCC581F0-8AA7-4B8F-A026-C1BCE495072A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Core", "Web.Domain\Web.Core.csproj", "{83862F9D-ACA7-4407-846B-C464B0D1FDE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Core", "Web.Core\Web.Core.csproj", "{83862F9D-ACA7-4407-846B-C464B0D1FDE8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Persistence", "Web.Persistence\Web.Persistence.csproj", "{0014E3EC-75BC-499B-8F48-C510D5E60F35}"
 EndProject

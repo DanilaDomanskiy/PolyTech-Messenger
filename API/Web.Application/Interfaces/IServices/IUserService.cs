@@ -1,11 +1,10 @@
 ﻿using Web.Application.Dto_s.User;
-using Web.Application.DTO_s.User;
 
 namespace Web.Application.Interfaces.IServices
 {
     public interface IUserService
     {
-        Task UpdateProfileImageAsync(ProfileImageDto model);
+        Task UpdateProfileImageAsync(string filePath, int userId);
 
         Task<string?> GetUserNameAsync(int id);
 
