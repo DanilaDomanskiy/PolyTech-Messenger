@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s.User;
-using Web.Application.DTO_s.Message;
-using Web.Application.DTO_s.PrivateChat;
+using Web.Application.Dto_s.Message;
+using Web.Application.Dto_s.PrivateChat;
 using Web.Core.Entities;
 
 namespace Web.Application

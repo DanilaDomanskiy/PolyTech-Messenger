@@ -1,4 +1,4 @@
-﻿namespace Web.Application.DTO_s.Message
+﻿namespace Web.Application.Dto_s.Message
 {
     public class SendPrivateChatMessageDto
     {

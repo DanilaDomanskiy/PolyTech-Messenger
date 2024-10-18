@@ -1,4 +1,4 @@
-﻿using Web.Application.DTO_s.PrivateChat;
+﻿using Web.Application.Dto_s.PrivateChat;
 
 namespace Web.Application.Interfaces.IServices
 {

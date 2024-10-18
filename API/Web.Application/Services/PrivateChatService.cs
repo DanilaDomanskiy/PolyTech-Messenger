@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Web.Application.DTO_s.PrivateChat;
+using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;

@@ -6,7 +6,7 @@ using System.Text;
 using Web.API;
 using Web.Application;
 using Web.Application.Dto_s.User;
-using Web.Application.DTO_s.Message;
+using Web.Application.Dto_s.Message;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
