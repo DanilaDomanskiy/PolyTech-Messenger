@@ -35,7 +35,7 @@ namespace Web.Application.Services
             }
 
             var user = _mapper.Map<User>(userDTO);
-            user.ProfilePicturePath = "profile-image/default.png";
+            user.ProfilePicturePath = "profile-images/default.png";
             user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
             await _userRepository.CreateAsync(user);
         }
