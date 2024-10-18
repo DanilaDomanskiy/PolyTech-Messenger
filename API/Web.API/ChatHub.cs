@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Web.Application.DTO_s.Message;
+using Web.Application.Dto_s.Message;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API

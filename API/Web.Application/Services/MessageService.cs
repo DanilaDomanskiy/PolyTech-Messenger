@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Web.Application.DTO_s.Message;
+using Web.Application.Dto_s.Message;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entities;
