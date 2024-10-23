@@ -30,7 +30,7 @@ namespace Web.Application.Services
             await _messageRepository.CreateAsync(message);
         }
 
-        public async Task<IEnumerable<ReadMessageDto>> GetMessagesByChatIdAsync(int chatId, int userId)
+        public async Task<IEnumerable<ReadMessageDto>?> GetMessagesByChatIdAsync(int chatId, int userId)
         {
             var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
 

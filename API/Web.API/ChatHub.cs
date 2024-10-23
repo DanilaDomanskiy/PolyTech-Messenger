@@ -27,7 +27,7 @@ namespace Web.API
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
 
-        public async Task SendPrivateChatMessage(SendPrivateChatMessageDto model)
+        public async Task SendPrivateChatMessage(SendMessageDto model)
         {
             var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
                 .FirstOrDefault(x => x.Type == "userId")?.Value;

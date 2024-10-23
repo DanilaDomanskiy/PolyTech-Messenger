@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Web.Application.Dto_s;
 using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entities;
@@ -17,7 +18,7 @@ namespace Web.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId)
+        public async Task<IEnumerable<ChatItemDto>?> GetChatsItemsAsync(int userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
 
@@ -25,10 +26,11 @@ namespace Web.Application.Services
             {
                 var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
 
-                return new PrivateChatUserDto
+                return new ChatItemDto
                 {
-                    PrivateChatId = chat.Id,
-                    SecondUserName = otherUser.Name
+                    Id = chat.Id,
+                    Name = otherUser.Name,
+                    Image = otherUser.ProfilePicturePath
                 };
             });
 

@@ -73,7 +73,7 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("search")]
+        [HttpGet("searchUser/{email}")]
         public async Task<IActionResult> SearchUsersByEmail(string email)
         {
             var users = await _userService.SearchByEmailAsync(email);
@@ -81,8 +81,8 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("userId")]
-        public IActionResult SearchUsersByEmail()
+        [HttpGet("getUserId")]
+        public IActionResult GetUserId()
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
             return Ok(userId);
@@ -96,7 +96,7 @@ namespace Web.API.Controllers
 
             var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            var validContentTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp" };
+            var validContentTypes = new[] { "image/jpg", "image/jpeg", "image/png", "image/gif", "image/bmp" };
             var contentType = file.ContentType.ToLowerInvariant();
 
             if (!validExtensions.Contains(extension) || !validContentTypes.Contains(contentType))
