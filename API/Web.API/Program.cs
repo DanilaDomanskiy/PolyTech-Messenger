@@ -68,7 +68,7 @@ builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IValidator<SendPrivateChatMessageDto>, SendPrivateChatMessageDtoValidator>();
+builder.Services.AddScoped<IValidator<SendMessageDto>, SendMessageDtoValidator>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
