@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Web.Application.Interfaces;
-using Web.Core.Entites;
+using Web.Core.Entities;
 
 namespace Web.Infrastructure
 {

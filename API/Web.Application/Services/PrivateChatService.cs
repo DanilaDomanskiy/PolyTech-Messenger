@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using Web.Application.DTO_s.PrivateChat;
+using Web.Application.Dto_s;
+using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -17,7 +18,7 @@ namespace Web.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<PrivateChatUserDto>> GetUserChatsAsync(int userId)
+        public async Task<IEnumerable<ChatItemDto>?> GetChatsItemsAsync(int userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
 
@@ -25,20 +26,15 @@ namespace Web.Application.Services
             {
                 var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
 
-                return new PrivateChatUserDto
+                return new ChatItemDto
                 {
-                    PrivateChatId = chat.Id,
-                    SecondUserName = otherUser.Name
+                    Id = chat.Id,
+                    Name = otherUser.Name,
+                    Image = otherUser.ProfilePicturePath
                 };
             });
 
             return privateChatUser;
-        }
-
-        public async Task<PrivateChatUsersDto?> GetChatUsersAsync(int id)
-        {
-            var chat = await _privateChatRepository.ReadAsync(id);
-            return chat == null ? null : _mapper.Map<PrivateChatUsersDto>(chat);
         }
 
         public async Task CreateChatAsync(PrivateChatUsersDto model)
@@ -51,9 +47,8 @@ namespace Web.Application.Services
         {
             var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
 
-            return privateChat == null ? false : 
-                privateChat.User1Id == userId || 
-                privateChat.User2Id == userId;
+            return privateChat != null && (privateChat.User1Id == userId ||
+                privateChat.User2Id == userId);
         }
 
         public async Task<string?> GetOtherUserNameAsync(int userId, int privateChatId)
@@ -73,6 +68,28 @@ namespace Web.Application.Services
             if (privateChat.User2Id == userId)
             {
                 return privateChat.User1.Name;
+            }
+
+            return null;
+        }
+
+        public async Task<string?> GetOtherUserProfileImagePathAsync(int userId, int privateChatId)
+        {
+            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
+
+            if (privateChat == null)
+            {
+                return null;
+            }
+
+            if (privateChat.User1Id == userId)
+            {
+                return privateChat.User2.ProfilePicturePath;
+            }
+
+            if (privateChat.User2Id == userId)
+            {
+                return privateChat.User1.ProfilePicturePath;
             }
 
             return null;

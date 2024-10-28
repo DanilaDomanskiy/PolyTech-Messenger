@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Web.Application.DTO_s.Message;
+using Web.Application.Dto_s.Message;
 
 namespace Web.Application.Validators.Message
 {
@@ -13,9 +13,6 @@ namespace Web.Application.Validators.Message
 
             RuleFor(x => x.Timestamp)
                 .LessThanOrEqualTo(DateTime.Now);
-
-            RuleFor(x => x.ConnectionId)
-                .NotEmpty();
 
             RuleFor(x => new { x.GroupId, x.PrivateChatId })
                 .Must(x => x.GroupId.HasValue || x.PrivateChatId.HasValue);

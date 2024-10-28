@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Web.Application.DTO_s.User;
+using Web.Application.Dto_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
-using Web.Core.Entites;
+using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -35,6 +35,7 @@ namespace Web.Application.Services
             }
 
             var user = _mapper.Map<User>(userDTO);
+            user.ProfilePicturePath = "profile-images/default.png";
             user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
             await _userRepository.CreateAsync(user);
         }
@@ -63,6 +64,13 @@ namespace Web.Application.Services
         {
             var users = await _userRepository.ReadAsyncByEmailLetters(email);
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
+        }
+
+        public async Task UpdateProfileImageAsync(string filePath, int userId)
+        {
+            var user = await _userRepository.ReadAsync(userId);
+            user.ProfilePicturePath = filePath;
+            await _userRepository.UpdateAsync(user);
         }
     }
 }

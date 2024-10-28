@@ -5,9 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Web.API;
 using Web.Application;
-using Web.Application.DTO_s;
-using Web.Application.DTO_s.Message;
-using Web.Application.DTO_s.User;
+using Web.Application.Dto_s.User;
+using Web.Application.Dto_s.Message;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
@@ -17,7 +16,6 @@ using Web.Core.IRepositories;
 using Web.Infrastructure;
 using Web.Persistence;
 using Web.Persistence.Repositories;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,8 +74,8 @@ builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator
 
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
-
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -92,7 +90,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 app.UseCors();
 

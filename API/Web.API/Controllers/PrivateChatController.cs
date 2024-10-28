@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Application.DTO_s.PrivateChat;
+using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Interfaces.IServices;
 
 namespace Web.API.Controllers
@@ -17,15 +17,15 @@ namespace Web.API.Controllers
             _privateChatService = privateChatService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetChatsName()
+        [HttpGet("getChats")]
+        public async Task<IActionResult> GetChats()
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var chats = await _privateChatService.GetUserChatsAsync(userId);
+            var chats = await _privateChatService.GetChatsItemsAsync(userId);
             return Ok(chats);
         }
 
-        [HttpPost("{userId}")]
+        [HttpPost("create/{userId}")]
         public async Task<IActionResult> CreateChat(int userId)
         {
             var currentUserId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
@@ -38,12 +38,21 @@ namespace Web.API.Controllers
             return Created();
         }
 
-        [HttpGet("chatName{privateChatId}")]
-        public async Task<IActionResult> GetUserName(int privateChatId)
+        [HttpGet("getChatName/{privateChatId}")]
+        public async Task<IActionResult> GetChatName(int privateChatId)
         {
             var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
             var userName = await _privateChatService.GetOtherUserNameAsync(userId, privateChatId);
             return userName == null ? Unauthorized() : Ok(userName);
+        }
+
+        [HttpGet("getChatImagePath/{privateChatId}")]
+        public async Task<IActionResult> GetChatImagePath(int privateChatId)
+        {
+            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var userProfileImagePath = await _privateChatService
+                .GetOtherUserProfileImagePathAsync(userId, privateChatId);
+            return userProfileImagePath == null ? Unauthorized() : Ok(userProfileImagePath);
         }
     }
 }
