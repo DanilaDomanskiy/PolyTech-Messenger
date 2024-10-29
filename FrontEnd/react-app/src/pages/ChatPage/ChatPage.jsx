@@ -11,6 +11,17 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [userName, setUserName] = useState("user");
 
+  const formatDate = (date) => {
+    const options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    };
+    return new Intl.DateTimeFormat("ru-Ru", options).format(date);
+  };
+
   useEffect(() => {
     socket.emit("joinChat", chatId);
     socket.on("newMessage", (message) => {
@@ -30,11 +41,18 @@ const ChatPage = () => {
       chatId,
       sender: userName,
       content: newMessage,
+      timestamp: new Date(),
     };
 
     socket.emit("sendMessage", messageData);
     setMessage((prevMessage) => [...prevMessage, messageData]);
     setNewMessage("");
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSendMessage();
+    }
   };
 
   return (
@@ -51,9 +69,10 @@ const ChatPage = () => {
               message.sender === userName ? "my-message" : "other-message"
             }`}
           >
-            <p>
-              <strong>{message.sender}:</strong> {message.content}
-            </p>
+            <p>{message.content}</p>
+            <span className="timestamp">
+              {formatDate(new Date(message.timestamp))}
+            </span>
           </div>
         ))}
       </div>
@@ -63,6 +82,7 @@ const ChatPage = () => {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Введите сообщение..."
         />
         <button onClick={handleSendMessage}>Отправить</button>
