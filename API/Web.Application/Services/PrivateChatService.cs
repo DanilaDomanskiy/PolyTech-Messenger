@@ -18,15 +18,15 @@ namespace Web.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ChatItemDto>?> GetChatsAsync(Guid userId)
+        public async Task<IEnumerable<PrivateChatDto>?> GetChatsAsync(Guid userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
 
-            var privateChatUser = chats.Select(chat =>
+            var privateChatUser = chats?.Select(chat =>
             {
                 var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
 
-                return new ChatItemDto
+                return new PrivateChatDto
                 {
                     Id = chat.Id,
                     Name = otherUser.Name,
@@ -47,7 +47,6 @@ namespace Web.Application.Services
         public async Task<bool> IsUserExistInChatAsync(Guid userId, Guid privateChatId)
         {
             var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
-
             return privateChat != null && (privateChat.User1Id == userId ||
                 privateChat.User2Id == userId);
         }

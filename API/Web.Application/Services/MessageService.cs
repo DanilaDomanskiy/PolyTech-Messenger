@@ -34,7 +34,7 @@ namespace Web.Application.Services
         {
             var messages = await _messageRepository.GetMessagesAsync(chatId, page, pageSize);
 
-            var readMessages = messages.Select(message =>
+            var readMessages = messages?.Select(message =>
             {
                 var readMessage = _mapper.Map<ReadMessageDto>(message);
                 readMessage.Content = _encryptionService.Decrypt(readMessage.Content);

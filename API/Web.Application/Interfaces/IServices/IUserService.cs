@@ -6,13 +6,11 @@ namespace Web.Application.Interfaces.IServices
     {
         Task UpdateProfileAsync(string filePath, Guid userId);
 
-        Task<string?> GetUserNameAsync(Guid id);
+        Task<string?> LoginUserAsync(AuthUserDto userDto);
 
-        Task<string?> LoginUserAsync(AuthUserDto userDTO);
+        Task AddUserAsync(RegisterUserDto userDto);
 
-        Task RegisterUserAsync(RegisterUserDto userDTO);
-
-        Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email, Guid currentUserId);
+        Task<IEnumerable<SearchUserDto>?> SearchByEmailAsync(string email, Guid currentUserId);
 
         Task<CurrentUserDto?> GetUserAsync(Guid userId);
     }

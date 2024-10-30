@@ -20,22 +20,30 @@ namespace Web.API.Controllers
         [HttpGet("all")]
         public async Task<IActionResult> GetChats()
         {
-            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var chats = await _privateChatService.GetChatsAsync(currentUserId);
-            return Ok(chats);
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                var chats = await _privateChatService.GetChatsAsync(currentUserId);
+                return Ok(chats);
+            }
+            return Unauthorized();
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateChat(Guid otherUser)
         {
-            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var privateChat = new PrivateChatUsersDto
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                User1Id = currentUserId,
-                User2Id = otherUser
-            };
-            var chatId = await _privateChatService.CreateChatAsync(privateChat);
-            return Ok(chatId);
+                var privateChat = new PrivateChatUsersDto
+                {
+                    User1Id = currentUserId,
+                    User2Id = otherUser
+                };
+                var chatId = await _privateChatService.CreateChatAsync(privateChat);
+                return Ok(chatId);
+            }
+            return Unauthorized();
         }
     }
 }
