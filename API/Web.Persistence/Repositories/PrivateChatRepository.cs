@@ -10,7 +10,7 @@ namespace Web.Persistence.Repositories
         {
         }
 
-        public override async Task<PrivateChat?> ReadAsync(int id)
+        public override async Task<PrivateChat?> ReadAsync(Guid id)
         {
             return await _context.PrivateChats
                 .AsNoTracking()
@@ -19,7 +19,7 @@ namespace Web.Persistence.Repositories
                 .FirstOrDefaultAsync(chat => chat.Id == id);
         }
 
-        public async Task<IEnumerable<PrivateChat>> GetChatsAsync(int userId)
+        public async Task<IEnumerable<PrivateChat>> GetChatsAsync(Guid userId)
         {
             return await _context.PrivateChats
                 .AsNoTracking()
@@ -27,6 +27,16 @@ namespace Web.Persistence.Repositories
                 .Include(chat => chat.User1)
                 .Include(chat => chat.User2)
                 .ToListAsync();
+        }
+
+        public async Task<Guid?> GetChatIdIfExistsAsync(Guid user1Id, Guid user2Id)
+        {
+            var chat = await _context.PrivateChats
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => (u.User1Id == user1Id && u.User2Id == user2Id)
+                                       || (u.User1Id == user2Id && u.User2Id == user1Id));
+
+            return chat?.Id;
         }
     }
 }

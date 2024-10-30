@@ -18,7 +18,7 @@ namespace Web.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ChatItemDto>?> GetChatsItemsAsync(int userId)
+        public async Task<IEnumerable<ChatItemDto>?> GetChatsAsync(Guid userId)
         {
             var chats = await _privateChatRepository.GetChatsAsync(userId);
 
@@ -30,69 +30,26 @@ namespace Web.Application.Services
                 {
                     Id = chat.Id,
                     Name = otherUser.Name,
-                    Image = otherUser.ProfilePicturePath
+                    ProfilePicturePath = otherUser.ProfilePicturePath
                 };
             });
 
             return privateChatUser;
         }
 
-        public async Task CreateChatAsync(PrivateChatUsersDto model)
+        public async Task<Guid> CreateChatAsync(PrivateChatUsersDto model)
         {
             var privateChat = _mapper.Map<PrivateChat>(model);
-            await _privateChatRepository.CreateAsync(privateChat);
+            var chatId = await _privateChatRepository.GetChatIdIfExistsAsync(model.User1Id, model.User2Id);
+            return chatId ?? await _privateChatRepository.CreateAsync(privateChat);
         }
 
-        public async Task<bool> IsUserExistInChatAsync(int userId, int privateChatId)
+        public async Task<bool> IsUserExistInChatAsync(Guid userId, Guid privateChatId)
         {
             var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
 
             return privateChat != null && (privateChat.User1Id == userId ||
                 privateChat.User2Id == userId);
-        }
-
-        public async Task<string?> GetOtherUserNameAsync(int userId, int privateChatId)
-        {
-            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
-
-            if (privateChat == null)
-            {
-                return null;
-            }
-
-            if (privateChat.User1Id == userId)
-            {
-                return privateChat.User2.Name;
-            }
-
-            if (privateChat.User2Id == userId)
-            {
-                return privateChat.User1.Name;
-            }
-
-            return null;
-        }
-
-        public async Task<string?> GetOtherUserProfileImagePathAsync(int userId, int privateChatId)
-        {
-            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
-
-            if (privateChat == null)
-            {
-                return null;
-            }
-
-            if (privateChat.User1Id == userId)
-            {
-                return privateChat.User2.ProfilePicturePath;
-            }
-
-            if (privateChat.User2Id == userId)
-            {
-                return privateChat.User1.ProfilePicturePath;
-            }
-
-            return null;
         }
     }
 }

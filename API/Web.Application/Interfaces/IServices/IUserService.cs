@@ -4,14 +4,16 @@ namespace Web.Application.Interfaces.IServices
 {
     public interface IUserService
     {
-        Task UpdateProfileImageAsync(string filePath, int userId);
+        Task UpdateProfileAsync(string filePath, Guid userId);
 
-        Task<string?> GetUserNameAsync(int id);
+        Task<string?> GetUserNameAsync(Guid id);
 
         Task<string?> LoginUserAsync(AuthUserDto userDTO);
 
         Task RegisterUserAsync(RegisterUserDto userDTO);
 
-        Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email);
+        Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email, Guid currentUserId);
+
+        Task<CurrentUserDto?> GetUserAsync(Guid userId);
     }
 }

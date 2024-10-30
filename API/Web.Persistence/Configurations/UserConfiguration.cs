@@ -20,13 +20,17 @@ namespace Web.Persistence.Configurations
                 .IsRequired();
 
             builder
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            builder
                 .Property(u => u.PasswordHash)
                 .IsRequired()
                 .HasMaxLength(100);
 
             builder
                 .Property(u => u.ProfilePicturePath)
-                .IsRequired()
+                .IsRequired(false)
                 .HasMaxLength(100);
 
             builder

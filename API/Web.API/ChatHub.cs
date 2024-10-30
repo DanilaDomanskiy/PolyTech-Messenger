@@ -32,7 +32,7 @@ namespace Web.API
             var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
                 .FirstOrDefault(x => x.Type == "userId")?.Value;
 
-            if (int.TryParse(userIdClaim, out int userId))
+            if (Guid.TryParse(userIdClaim, out Guid userId))
             {
                 await Clients.GroupExcept("pc" + model.PrivateChatId, Context.ConnectionId)
                     .SendAsync("ReceivePrivateChatMessage", userId, model.Content, model.Timestamp);

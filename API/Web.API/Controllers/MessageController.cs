@@ -20,18 +20,18 @@ namespace Web.API.Controllers
             _privateChatService = privateChatService;
         }
 
-        [HttpGet("byChatId/{chatId}")]
-        public async Task<IActionResult> GetMessagesByChatId(int chatId)
+        [HttpGet("byChatId")]
+        public async Task<IActionResult> GetMessages(Guid chatId, int page = 1, int pageSize = 20)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var isUserExist = await _privateChatService.IsUserExistInChatAsync(userId, chatId);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var isUserExist = await _privateChatService.IsUserExistInChatAsync(currentUserId, chatId);
 
             if (!isUserExist)
             {
                 return Unauthorized();
             }
 
-            var messages = await _messageService.GetMessagesByChatIdAsync(chatId, userId);
+            var messages = await _messageService.GetMessagesAsync(chatId, currentUserId, page, pageSize);
 
             return Ok(messages);
         }

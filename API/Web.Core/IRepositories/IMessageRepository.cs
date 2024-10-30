@@ -4,6 +4,6 @@ namespace Web.Core.IRepositories
 {
     public interface IMessageRepository : IBaseRepository<Message>
     {
-        Task<IEnumerable<Message>> GetMessagesByChatIdAsync(int privateChatId);
+        Task<IEnumerable<Message>> GetMessagesAsync(Guid privateChatId, int page, int pageSize);
     }
 }
