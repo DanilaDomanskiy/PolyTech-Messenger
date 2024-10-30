@@ -19,7 +19,7 @@ namespace Web.Persistence.Repositories
                 .FirstOrDefaultAsync(chat => chat.Id == id);
         }
 
-        public async Task<IEnumerable<PrivateChat>> GetChatsAsync(Guid userId)
+        public async Task<IEnumerable<PrivateChat>?> GetChatsAsync(Guid userId)
         {
             return await _context.PrivateChats
                 .AsNoTracking()

@@ -10,7 +10,7 @@ namespace Web.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<Message>> GetMessagesAsync(Guid privateChatId, int page, int pageSize)
+        public async Task<IEnumerable<Message>?> GetMessagesAsync(Guid privateChatId, int page, int pageSize)
         {
             return await _context.Messages
                 .AsNoTracking()

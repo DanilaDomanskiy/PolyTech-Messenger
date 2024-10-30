@@ -5,7 +5,7 @@ namespace Web.Application.Interfaces.IServices
 {
     public interface IPrivateChatService
     {
-        Task<IEnumerable<ChatItemDto>?> GetChatsAsync(Guid userId);
+        Task<IEnumerable<PrivateChatDto>?> GetChatsAsync(Guid userId);
 
         Task<Guid> CreateChatAsync(PrivateChatUsersDto model);
 

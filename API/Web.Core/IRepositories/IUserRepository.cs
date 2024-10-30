@@ -8,6 +8,6 @@ namespace Web.Core.IRepositories
 
         Task<User?> ReadAsyncByEmail(string email);
 
-        Task<IEnumerable<User>> ReadAsyncByEmailLetters(string email, Guid Id);
+        Task<IEnumerable<User>?> ReadAsyncByEmailLetters(string email, Guid Id);
     }
 }
