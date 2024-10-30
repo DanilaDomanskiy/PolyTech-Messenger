@@ -17,42 +17,25 @@ namespace Web.API.Controllers
             _privateChatService = privateChatService;
         }
 
-        [HttpGet("getChats")]
+        [HttpGet("all")]
         public async Task<IActionResult> GetChats()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var chats = await _privateChatService.GetChatsItemsAsync(userId);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var chats = await _privateChatService.GetChatsAsync(currentUserId);
             return Ok(chats);
         }
 
-        [HttpPost("create/{userId}")]
-        public async Task<IActionResult> CreateChat(int userId)
+        [HttpPost]
+        public async Task<IActionResult> CreateChat(Guid otherUser)
         {
-            var currentUserId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
             var privateChat = new PrivateChatUsersDto
             {
                 User1Id = currentUserId,
-                User2Id = userId
+                User2Id = otherUser
             };
-            await _privateChatService.CreateChatAsync(privateChat);
-            return Created();
-        }
-
-        [HttpGet("getChatName/{privateChatId}")]
-        public async Task<IActionResult> GetChatName(int privateChatId)
-        {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var userName = await _privateChatService.GetOtherUserNameAsync(userId, privateChatId);
-            return userName == null ? Unauthorized() : Ok(userName);
-        }
-
-        [HttpGet("getChatImagePath/{privateChatId}")]
-        public async Task<IActionResult> GetChatImagePath(int privateChatId)
-        {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            var userProfileImagePath = await _privateChatService
-                .GetOtherUserProfileImagePathAsync(userId, privateChatId);
-            return userProfileImagePath == null ? Unauthorized() : Ok(userProfileImagePath);
+            var chatId = await _privateChatService.CreateChatAsync(privateChat);
+            return Ok(chatId);
         }
     }
 }

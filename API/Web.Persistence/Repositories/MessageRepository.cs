@@ -10,11 +10,14 @@ namespace Web.Persistence.Repositories
         {
         }
 
-        public async Task<IEnumerable<Message>> GetMessagesByChatIdAsync(int privateChatId)
+        public async Task<IEnumerable<Message>> GetMessagesAsync(Guid privateChatId, int page, int pageSize)
         {
             return await _context.Messages
                 .AsNoTracking()
                 .Where(m => m.PrivateChatId == privateChatId)
+                .OrderByDescending(m => m.Timestamp)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
     }

@@ -13,13 +13,14 @@ namespace Web.Persistence.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(Model model)
+        public async Task<Guid> CreateAsync(Model model)
         {
             await _context.Set<Model>().AddAsync(model);
             await _context.SaveChangesAsync();
+            return model.Id;
         }
 
-        public virtual async Task<Model?> ReadAsync(int id)
+        public virtual async Task<Model?> ReadAsync(Guid id)
         {
             return await _context.Set<Model>()
                 .AsNoTracking()

@@ -33,9 +33,7 @@ namespace Web.Application.Services
             {
                 throw new InvalidOperationException();
             }
-
             var user = _mapper.Map<User>(userDTO);
-            user.ProfilePicturePath = "profile-images/default.png";
             user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
             await _userRepository.CreateAsync(user);
         }
@@ -54,23 +52,29 @@ namespace Web.Application.Services
             return token;
         }
 
-        public async Task<string?> GetUserNameAsync(int id)
+        public async Task<string?> GetUserNameAsync(Guid id)
         {
             var user = await _userRepository.ReadAsync(id);
             return user?.Name ?? null;
         }
 
-        public async Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email)
+        public async Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email, Guid currentUserId)
         {
-            var users = await _userRepository.ReadAsyncByEmailLetters(email);
+            var users = await _userRepository.ReadAsyncByEmailLetters(email, currentUserId);
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task UpdateProfileImageAsync(string filePath, int userId)
+        public async Task UpdateProfileAsync(string filePath, Guid userId)
         {
             var user = await _userRepository.ReadAsync(userId);
             user.ProfilePicturePath = filePath;
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task<CurrentUserDto?> GetUserAsync(Guid userId)
+        {
+            var user = await _userRepository.ReadAsync(userId);
+            return _mapper.Map<CurrentUserDto>(user);
         }
     }
 }

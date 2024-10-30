@@ -24,11 +24,11 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("GroupUser", b =>
                 {
-                    b.Property<int>("GroupsId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("GroupsId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("UsersId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("GroupsId", "UsersId");
 
@@ -39,14 +39,12 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -62,28 +60,23 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("Web.Core.Entities.Message", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("FileId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("PrivateChatId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("PrivateChatId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
@@ -96,51 +89,22 @@ namespace Web.Persistence.Migrations
 
                     b.HasIndex("SenderId");
 
+                    b.HasIndex("Timestamp");
+
                     b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("Web.Core.Entities.MessageFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("MessageId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MessageId")
-                        .IsUnique();
-
-                    b.ToTable("MessagesFile");
                 });
 
             modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("User1Id")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("User1Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("User2Id")
-                        .HasColumnType("int");
+                    b.Property<Guid>("User2Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -153,15 +117,13 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("Web.Core.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -174,11 +136,13 @@ namespace Web.Persistence.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProfilePicturePath")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -234,17 +198,6 @@ namespace Web.Persistence.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Web.Core.Entities.MessageFile", b =>
-                {
-                    b.HasOne("Web.Core.Entities.Message", "Message")
-                        .WithOne("File")
-                        .HasForeignKey("Web.Core.Entities.MessageFile", "MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Message");
-                });
-
             modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
                 {
                     b.HasOne("Web.Core.Entities.User", "User1")
@@ -267,12 +220,6 @@ namespace Web.Persistence.Migrations
             modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
                     b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("Web.Core.Entities.Message", b =>
-                {
-                    b.Navigation("File")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>

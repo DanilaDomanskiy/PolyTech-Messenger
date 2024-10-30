@@ -34,14 +34,8 @@ namespace Web.API.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthUserDto model)
+        public async Task<IActionResult> Login([FromBody] AuthUserDto user)
         {
-            var user = new AuthUserDto
-            {
-                Login = model.Login,
-                Password = model.Password
-            };
-
             var token = await _userService.LoginUserAsync(user);
 
             if (token == null)
@@ -61,6 +55,7 @@ namespace Web.API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPost("logout")]
         public IActionResult Logout()
         {
@@ -73,29 +68,31 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("searchUser/{email}")]
-        public async Task<IActionResult> SearchUsersByEmail(string email)
+        [HttpGet("searchByEmail")]
+        public async Task<IActionResult> SearchByEmail(string email)
         {
-            var users = await _userService.SearchByEmailAsync(email);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var users = await _userService.SearchByEmailAsync(email, currentUserId);
             return Ok(users);
         }
 
         [Authorize]
-        [HttpGet("getUserId")]
+        [HttpGet("id")]
         public IActionResult GetUserId()
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
-            return Ok(userId);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            return Ok(currentUserId);
         }
 
         [Authorize]
-        [HttpPut("updateProfileImage")]
-        public async Task<IActionResult> UpdateAvatar(IFormFile file)
+        [HttpPut("profileImage")]
+        public async Task<IActionResult> UpdateProfileImage(IFormFile file)
         {
-            var userId = int.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
 
             var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
             var validContentTypes = new[] { "image/jpg", "image/jpeg", "image/png", "image/gif", "image/bmp" };
             var contentType = file.ContentType.ToLowerInvariant();
 
@@ -104,14 +101,14 @@ namespace Web.API.Controllers
                 return StatusCode(409);
             }
 
-            var oldFiles = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{userId}.*");
+            var oldFiles = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*");
 
             foreach (var oldFile in oldFiles)
             {
                 System.IO.File.Delete(oldFile);
             }
 
-            var path = $"profile-images/{userId}{extension}";
+            var path = $"profile-images/{currentUserId}{extension}";
             var filePath = Path.Combine(_folderPath, path);
 
             using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -119,14 +116,14 @@ namespace Web.API.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            await _userService.UpdateProfileImageAsync(path, userId);
+            await _userService.UpdateProfileAsync(path, currentUserId);
 
             return NoContent();
         }
 
         [Authorize]
-        [HttpGet("getProfileImage")]
-        public async Task<IActionResult> GetProfileImage(string imagePath)
+        [HttpGet("profileImage")]
+        public IActionResult GetProfileImage(string imagePath)
         {
             var fileFullPath = Path.Combine(_folderPath, imagePath);
             if (!System.IO.File.Exists(fileFullPath))
@@ -134,6 +131,15 @@ namespace Web.API.Controllers
                 return NotFound();
             }
             return PhysicalFile(fileFullPath, "application/octet-stream");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var currentUserId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "userId").Value);
+            var user = await _userService.GetUserAsync(currentUserId);
+            return Ok(user);
         }
     }
 }

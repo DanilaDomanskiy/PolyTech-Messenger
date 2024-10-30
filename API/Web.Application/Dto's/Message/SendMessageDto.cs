@@ -4,7 +4,7 @@
     {
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
-        public int? PrivateChatId { get; set; }
-        public int? GroupId { get; set; }
+        public Guid? PrivateChatId { get; set; }
+        public Guid? GroupId { get; set; }
     }
 }
