@@ -19,11 +19,15 @@ namespace Web.Persistence.Configurations
                 .Property(m => m.Timestamp)
                 .IsRequired();
 
+            builder.HasIndex(m => m.Timestamp);
+
             builder
                 .HasOne(m => m.Sender)
                 .WithMany(s => s.SentMessages)
                 .HasForeignKey(m => m.SenderId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(m => m.SenderId);
 
             builder
                 .HasOne(m => m.Group)
@@ -31,17 +35,15 @@ namespace Web.Persistence.Configurations
                 .HasForeignKey(m => m.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasIndex(m => m.GroupId);
+
             builder
                 .HasOne(m => m.PrivateChat)
                 .WithMany(pc => pc.Messages)
                 .HasForeignKey(m => m.PrivateChatId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder
-                .HasOne(m => m.File)
-                .WithOne(f => f.Message)
-                .HasForeignKey<MessageFile>(f => f.MessageId)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.HasIndex(m => m.PrivateChatId);
         }
     }
 }

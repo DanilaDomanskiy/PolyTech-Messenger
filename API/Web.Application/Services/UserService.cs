@@ -26,17 +26,15 @@ namespace Web.Application.Services
             _mapper = mapper;
         }
 
-        public async Task RegisterUserAsync(RegisterUserDto userDTO)
+        public async Task AddUserAsync(RegisterUserDto userDto)
         {
-            var isUserExists = await _userRepository.IsUserExistsAsync(userDTO.Email);
+            var isUserExists = await _userRepository.IsUserExistsAsync(userDto.Email);
             if (isUserExists)
             {
                 throw new InvalidOperationException();
             }
-
-            var user = _mapper.Map<User>(userDTO);
-            user.ProfilePicturePath = "profile-images/default.png";
-            user.PasswordHash = _passwordHasher.Generate(userDTO.Password);
+            var user = _mapper.Map<User>(userDto);
+            user.PasswordHash = _passwordHasher.Generate(userDto.Password);
             await _userRepository.CreateAsync(user);
         }
 
@@ -54,23 +52,26 @@ namespace Web.Application.Services
             return token;
         }
 
-        public async Task<string?> GetUserNameAsync(int id)
+        public async Task<IEnumerable<SearchUserDto>?> SearchByEmailAsync(string email, Guid currentUserId)
         {
-            var user = await _userRepository.ReadAsync(id);
-            return user?.Name ?? null;
-        }
-
-        public async Task<IEnumerable<SearchUserDto>> SearchByEmailAsync(string email)
-        {
-            var users = await _userRepository.ReadAsyncByEmailLetters(email);
+            var users = await _userRepository.ReadAsyncByEmailLetters(email, currentUserId);
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task UpdateProfileImageAsync(string filePath, int userId)
+        public async Task UpdateProfileAsync(string filePath, Guid userId)
         {
             var user = await _userRepository.ReadAsync(userId);
-            user.ProfilePicturePath = filePath;
-            await _userRepository.UpdateAsync(user);
+            if (user != null)
+            {
+                user.ProfilePicturePath = filePath;
+                await _userRepository.UpdateAsync(user);
+            }
+        }
+
+        public async Task<CurrentUserDto?> GetUserAsync(Guid userId)
+        {
+            var user = await _userRepository.ReadAsync(userId);
+            return _mapper.Map<CurrentUserDto>(user);
         }
     }
 }

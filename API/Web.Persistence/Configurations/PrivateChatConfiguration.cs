@@ -11,6 +11,10 @@ namespace Web.Persistence.Configurations
             builder
                 .HasKey(pc => pc.Id);
 
+            builder.HasIndex(pc => pc.User1Id);
+
+            builder.HasIndex(pc => pc.User2Id);
+
             builder
                 .HasOne(pc => pc.User1)
                 .WithMany(u1 => u1.PrivateChatsAsUser1)

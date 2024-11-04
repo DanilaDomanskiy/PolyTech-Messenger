@@ -30,11 +30,11 @@ namespace Web.Application.Services
             await _messageRepository.CreateAsync(message);
         }
 
-        public async Task<IEnumerable<ReadMessageDto>?> GetMessagesByChatIdAsync(int chatId, int userId)
+        public async Task<IEnumerable<ReadMessageDto>?> GetMessagesAsync(Guid chatId, Guid userId, int page, int pageSize)
         {
-            var messages = await _messageRepository.GetMessagesByChatIdAsync(chatId);
+            var messages = await _messageRepository.GetMessagesAsync(chatId, page, pageSize);
 
-            var readMessages = messages.Select(message =>
+            var readMessages = messages?.Select(message =>
             {
                 var readMessage = _mapper.Map<ReadMessageDto>(message);
                 readMessage.Content = _encryptionService.Decrypt(readMessage.Content);

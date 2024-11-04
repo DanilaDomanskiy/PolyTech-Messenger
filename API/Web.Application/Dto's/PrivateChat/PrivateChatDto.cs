@@ -1,10 +1,9 @@
-﻿namespace Web.Application.Dto_s.User
+﻿namespace Web.Application.Dto_s
 {
-    public class SearchUserDto
+    public class PrivateChatDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Email { get; set; }
         public string? ProfilePicturePath { get; set; }
     }
 }

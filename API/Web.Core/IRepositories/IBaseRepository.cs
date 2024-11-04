@@ -2,9 +2,9 @@
 {
     public interface IBaseRepository<Model> where Model : class
     {
-        Task CreateAsync(Model model);
+        Task<Guid> CreateAsync(Model model);
 
-        Task<Model?> ReadAsync(int id);
+        Task<Model?> ReadAsync(Guid id);
 
         Task UpdateAsync(Model model);
     }
