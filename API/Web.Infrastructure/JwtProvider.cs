@@ -16,11 +16,6 @@ namespace Web.Infrastructure
         {
             Claim[] claims = [new("userId", user.Id.ToString())];
 
-            //if (user.IsAdmin)
-            //{
-            //    claims = claims.Append(new Claim("role", "Admin")).ToArray();
-            //}
-
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
                 SecurityAlgorithms.HmacSha256);

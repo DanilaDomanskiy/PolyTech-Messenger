@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Web.Core.Entities;
+﻿using Web.Core.Entities;
 using Web.Core.IRepositories;
 
 namespace Web.Persistence.Repositories
@@ -13,7 +12,7 @@ namespace Web.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<Guid> CreateAsync(Model model)
+        public virtual async Task<Guid> CreateAsync(Model model)
         {
             await _context.Set<Model>().AddAsync(model);
             await _context.SaveChangesAsync();
@@ -22,9 +21,7 @@ namespace Web.Persistence.Repositories
 
         public virtual async Task<Model?> ReadAsync(Guid id)
         {
-            return await _context.Set<Model>()
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Set<Model>().FindAsync(id);
         }
 
         public async Task UpdateAsync(Model model)
@@ -35,6 +32,22 @@ namespace Web.Persistence.Repositories
                 _context.Entry(existingModel).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            var entity = await _context.Set<Model>().FindAsync(id);
+            if (entity != null)
+            {
+                _context.Set<Model>().Remove(entity);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteAsync(Model model)
+        {
+            _context.Set<Model>().Remove(model);
+            await _context.SaveChangesAsync();
         }
     }
 }

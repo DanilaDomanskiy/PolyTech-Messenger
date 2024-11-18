@@ -11,17 +11,20 @@ namespace Web.API.Controllers
     {
         private readonly IMessageService _messageService;
         private readonly IPrivateChatService _privateChatService;
+        private readonly IGroupService _groupService;
 
         public MessageController(
             IMessageService messageService,
-            IPrivateChatService privateChatService)
+            IPrivateChatService privateChatService,
+            IGroupService groupService)
         {
             _messageService = messageService;
             _privateChatService = privateChatService;
+            _groupService = groupService;
         }
 
         [HttpGet("byChatId")]
-        public async Task<IActionResult> GetMessages(Guid chatId, int page = 1, int pageSize = 20)
+        public async Task<IActionResult> GetChatMessages(Guid chatId, int page = 1, int pageSize = 20)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
@@ -33,9 +36,41 @@ namespace Web.API.Controllers
                     return Forbid();
                 }
 
-                var messages = await _messageService.GetMessagesAsync(chatId, currentUserId, page, pageSize);
+                var messages = await _messageService.GetChatMessagesAsync(chatId, currentUserId, page, pageSize);
 
                 return Ok(messages);
+            }
+            return Unauthorized();
+        }
+
+        [HttpGet("byGroupId")]
+        public async Task<IActionResult> GetGroupMessages(Guid groupId, int page = 1, int pageSize = 20)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                var isUserExist = await _groupService.IsUserExistInGroupAsync(currentUserId, groupId);
+
+                if (!isUserExist)
+                {
+                    return Forbid();
+                }
+
+                var messages = await _messageService.GetGroupMessagesAsync(groupId, currentUserId, page, pageSize);
+
+                return Ok(messages);
+            }
+            return Unauthorized();
+        }
+
+        [HttpDelete("/{messageId}")]
+        public async Task<IActionResult> DeleteAsync(Guid messageId)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                await _messageService.DeleteAsync(messageId, currentUserId);
+                return NoContent();
             }
             return Unauthorized();
         }

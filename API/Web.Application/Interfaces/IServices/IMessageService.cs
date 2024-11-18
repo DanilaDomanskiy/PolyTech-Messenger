@@ -4,8 +4,12 @@ namespace Web.Application.Interfaces.IServices
 {
     public interface IMessageService
     {
-        Task<IEnumerable<ReadMessageDto>?> GetMessagesAsync(Guid chatId, Guid userId, int page, int pageSize);
+        Task<IEnumerable<ReadGroupMessageDto>?> GetGroupMessagesAsync(Guid groupId, Guid userId, int page, int pageSize);
 
-        Task SaveMessageAsync(SaveMessageDto saveMessageDTO);
+        Task<IEnumerable<ReadChatMessageDto>?> GetChatMessagesAsync(Guid chatId, Guid userId, int page, int pageSize);
+
+        public Task<Guid> SaveMessageAsync(SaveMessageDto saveMessageDTO);
+
+        Task DeleteAsync(Guid messageId, Guid userId);
     }
 }

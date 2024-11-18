@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s;
 using Web.Application.Dto_s.PrivateChat;
+using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
@@ -10,45 +11,107 @@ namespace Web.Application.Services
     public class PrivateChatService : IPrivateChatService
     {
         private readonly IPrivateChatRepository _privateChatRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IEncryptionService _encryptionService;
 
-        public PrivateChatService(IPrivateChatRepository privateChatRepository, IMapper mapper)
+        public PrivateChatService(
+            IPrivateChatRepository privateChatRepository,
+            IMapper mapper,
+            IUserRepository userRepository,
+            IEncryptionService encryptionService)
         {
             _privateChatRepository = privateChatRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
+            _encryptionService = encryptionService;
         }
 
-        public async Task<IEnumerable<PrivateChatDto>?> GetChatsAsync(Guid userId)
+        public async Task<IEnumerable<PrivateChatItemDto>> GetChatsAsync(Guid currentUserId)
         {
-            var chats = await _privateChatRepository.GetChatsAsync(userId);
+            var chats = await _privateChatRepository.ReadChatsWithSecondUserAsync(currentUserId);
 
-            var privateChatUser = chats?.Select(chat =>
+            if (chats == null) return Enumerable.Empty<PrivateChatItemDto>();
+
+            return chats.Select(chat =>
             {
-                var otherUser = chat.User1Id == userId ? chat.User2 : chat.User1;
+                var otherUser = chat.Users.FirstOrDefault(user => user.Id != currentUserId);
 
-                return new PrivateChatDto
+                var lastMessage = chat.Messages.LastOrDefault();
+
+                if (lastMessage != null)
+                {
+                    lastMessage.Content = _encryptionService.Decrypt(lastMessage.Content);
+                }
+
+                return new PrivateChatItemDto
                 {
                     Id = chat.Id,
-                    Name = otherUser.Name,
-                    ProfilePicturePath = otherUser.ProfilePicturePath
+                    SecondUser = otherUser != null ? _mapper.Map<SecondUser>(otherUser) : null,
+                    LastMessage = lastMessage != null ? _mapper.Map<LastMessage>(lastMessage) : null,
+                    UnreadMessagesCount = chat.UnreadMessages.Any() ? chat.UnreadMessages.First().Count : 0,
                 };
             });
-
-            return privateChatUser;
         }
 
-        public async Task<Guid> CreateChatAsync(PrivateChatUsersDto model)
+        public async Task<Guid?> CreateChatAsync(PrivateChatUsersDto model)
         {
-            var privateChat = _mapper.Map<PrivateChat>(model);
-            var chatId = await _privateChatRepository.GetChatIdIfExistsAsync(model.User1Id, model.User2Id);
-            return chatId ?? await _privateChatRepository.CreateAsync(privateChat);
+            var chatId = await _privateChatRepository.ReadChatIdIfChatExistsAsync(model.User1Id, model.User2Id);
+            if (chatId.HasValue)
+            {
+                return chatId.Value;
+            }
+
+            var newChat = new PrivateChat
+            {
+                Users = new List<User>
+                {
+                    await _userRepository.ReadAsync(model.User1Id),
+                    await _userRepository.ReadAsync(model.User2Id)
+                },
+                Messages = new List<Message>()
+            };
+
+            await _privateChatRepository.CreateAsync(newChat);
+            return newChat.Id;
         }
 
         public async Task<bool> IsUserExistInChatAsync(Guid userId, Guid privateChatId)
         {
-            var privateChat = await _privateChatRepository.ReadAsync(privateChatId);
-            return privateChat != null && (privateChat.User1Id == userId ||
-                privateChat.User2Id == userId);
+            return await _privateChatRepository.IsUserExistInChatAsync(userId, privateChatId);
+        }
+
+        public async Task DeleteIfEmptyAsync(Guid chatId)
+        {
+            await _privateChatRepository.DeleteIfEmptyAsync(chatId);
+        }
+
+        public async Task<PrivateChatItemDto?> GetChatAsync(Guid chatId, Guid currentUserId)
+        {
+            var chat = await _privateChatRepository.ReadChatWithSecondUserAsync(chatId, currentUserId);
+
+            if (chat == null) return null;
+
+            var otherUser = chat.Users.FirstOrDefault(user => user.Id != currentUserId);
+            var lastMessage = chat.Messages.LastOrDefault();
+
+            if (lastMessage != null)
+            {
+                lastMessage.Content = _encryptionService.Decrypt(lastMessage.Content);
+            }
+
+            return new PrivateChatItemDto
+            {
+                Id = chat.Id,
+                SecondUser = otherUser != null ? _mapper.Map<SecondUser>(otherUser) : null,
+                LastMessage = lastMessage != null ? _mapper.Map<LastMessage>(lastMessage) : null,
+                UnreadMessagesCount = chat.UnreadMessages.Any() ? chat.UnreadMessages.First().Count : 0,
+            };
+        }
+
+        public async Task UpdateUnreadMessagesAsync(Guid privateChatId, Guid currentUserId)
+        {
+            await _privateChatRepository.UpdateUnreadMessagesAsync(privateChatId, currentUserId);
         }
     }
 }

@@ -47,9 +47,7 @@ namespace Web.Application.Services
                 return null;
             }
 
-            var token = _jwtProvider.GenerateToken(user);
-
-            return token;
+            return _jwtProvider.GenerateToken(user);
         }
 
         public async Task<IEnumerable<SearchUserDto>?> SearchByEmailAsync(string email, Guid currentUserId)
@@ -63,7 +61,7 @@ namespace Web.Application.Services
             var user = await _userRepository.ReadAsync(userId);
             if (user != null)
             {
-                user.ProfilePicturePath = filePath;
+                user.ProfileImagePath = filePath;
                 await _userRepository.UpdateAsync(user);
             }
         }

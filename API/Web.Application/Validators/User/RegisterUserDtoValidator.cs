@@ -9,7 +9,7 @@ namespace Web.Application.Validators.User
         {
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .MaximumLength(100);
+                .MaximumLength(30);
 
             RuleFor(x => x.Email)
                 .NotEmpty()

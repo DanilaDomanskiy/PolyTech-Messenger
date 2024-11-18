@@ -2,15 +2,14 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Text;
 using Web.API;
 using Web.Application;
-using Web.Application.Dto_s.Message;
 using Web.Application.Dto_s.User;
 using Web.Application.Interfaces;
 using Web.Application.Interfaces.IServices;
 using Web.Application.Services;
-using Web.Application.Validators.Message;
 using Web.Application.Validators.User;
 using Web.Core.IRepositories;
 using Web.Infrastructure;
@@ -52,13 +51,26 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policyBuilder =>
     {
-        policyBuilder.WithOrigins("http://localhost:3000", "https://localhost:7205")
-                     .AllowAnyHeader()
-                     .AllowAnyMethod()
-                     .AllowCredentials();
+        policyBuilder
+            .WithOrigins("http://localhost:3000", "https://localhost:7205")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("RedisConnectionString");
+    var configurationOptions = new ConfigurationOptions
+    {
+        EndPoints = { connectionString },
+        AbortOnConnectFail = false
+    };
+    return ConnectionMultiplexer.Connect(configurationOptions);
+});
+
+builder.Services.AddSingleton<ICasheProvider, CasheProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
@@ -68,7 +80,12 @@ builder.Services.AddScoped<IPrivateChatRepository, PrivateChatRepository>();
 builder.Services.AddScoped<IPrivateChatService, PrivateChatService>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IValidator<SendMessageDto>, SendMessageDtoValidator>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IUserConnectionRepository, UserConnectionRepository>();
+builder.Services.AddScoped<IUserConnectionService, UserConnectionService>();
+builder.Services.AddScoped<IUnreadMessagesRepository, UnreadMessagesRepository>();
+builder.Services.AddScoped<IUnreadMessagesService, UnreadMessagesService>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 

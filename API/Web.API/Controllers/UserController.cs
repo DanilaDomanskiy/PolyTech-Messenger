@@ -152,6 +152,10 @@ namespace Web.API.Controllers
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
                 var user = await _userService.GetUserAsync(currentUserId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
                 return Ok(user);
             }
             return Unauthorized();
