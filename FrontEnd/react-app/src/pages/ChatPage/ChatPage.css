@@ -3,11 +3,12 @@
   flex-direction: column;
   border-radius: 20px;
   height: 100vh;
-  background-color: white;
+  background-color: rgb(235, 235, 235);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   width: 80vw;
   max-width: 1200px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .chat-header {
@@ -17,6 +18,7 @@
   color: white;
   text-align: center;
   font-size: 18px;
+  font-weight: bold;
 }
 
 .chat-messages {
@@ -25,15 +27,15 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 10px; /* расстояние между сообщениями */
 }
 
 .message {
   margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 18px 18px 0px 18px;
+  padding: 10px 15px;
+  border-radius: 18px 18px 0 18px;
   max-width: 60%;
   word-wrap: break-word;
-  word-break: break-word;
   line-height: 1.4;
   position: relative;
 }
@@ -42,17 +44,20 @@
   background-color: #2c804c;
   color: white;
   align-self: flex-end;
+  border-radius: 18px 18px 18px 0; /* измененный угол для пользовательского сообщения */
 }
 
 .other-message {
   background-color: #f0f0f0;
   align-self: flex-start;
+  border-radius: 18px 18px 0 18px; /* измененный угол для сообщения другого пользователя */
 }
 
 .chat-input {
   display: flex;
   padding: 10px;
   border-top: 1px solid #ddd;
+  background-color: #fff;
 }
 
 .chat-input input {
@@ -60,6 +65,13 @@
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #ddd;
+  outline: none;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.chat-input input:focus {
+  border-color: #2c804c;
 }
 
 .chat-input button {
@@ -70,6 +82,12 @@
   margin-left: 10px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.chat-input button:hover {
+  background-color: #26703d;
 }
 
 .timestamp {

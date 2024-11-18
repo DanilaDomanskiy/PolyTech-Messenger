@@ -23,7 +23,7 @@ body {
   padding: 20px;
   text-align: center;
   margin: 10px 0;
-  min-height: calc(100vh - 20px);
+  min-height: calc(100vh - 10px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -33,7 +33,7 @@ body {
 .search-container {
   position: relative;
   width: 100%;
-  margin-bottom: 30px; /* Добавляем отступ снизу */
+  margin-bottom: 60px; /* Добавляем отступ снизу */
 }
 
 /* Стили для поля поиска */
@@ -71,7 +71,6 @@ body {
 .button-container {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 20px;
 }
 
 .button {
@@ -106,6 +105,7 @@ body {
   font-size: 24px; /* Увеличен размер заголовка */
   color: #2c804c;
   margin-bottom: 10px; /* Увеличен отступ после заголовка */
+  text-align: center;
 }
 
 #content p {
@@ -114,8 +114,55 @@ body {
   color: #333;
 }
 
-/* Увеличиваем отступ между заголовком и контентом */
-#privateMessages,
-#groupMessages {
-  margin-top: 30px;
+/* Заголовок чатов */
+#privateMessages .title,
+#groupMessages .title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #2c804c;
+  margin-bottom: 15px;
+}
+
+/* Стили для списка чатов */
+#privateMessages ul,
+#groupMessages ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Элемент списка чатов */
+#privateMessages li,
+#groupMessages li {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+#privateMessages li:hover,
+#groupMessages li:hover {
+  background-color: #e9f5ec;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Название чата */
+#privateMessages li span,
+#groupMessages li span {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Стили для пустого состояния чатов */
+#privateMessages p,
+#groupMessages p {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin: 20px 0;
 }

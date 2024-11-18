@@ -19,6 +19,10 @@ const AuthForm = () => {
         {
           login,
           password,
+          withCredentials: true,
+        },
+        {
+          withCredentials: true,
         }
       );
 

@@ -16,11 +16,17 @@ const RegistrForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("https://localhost:7205/api/user", {
-        name,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://localhost:7205/api/user",
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status >= 200 && response.status <= 299) {
         setMessage("Регистрация прошла успешно!");

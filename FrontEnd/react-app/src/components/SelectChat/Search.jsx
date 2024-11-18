@@ -16,9 +16,10 @@ const Search = () => {
 
     try {
       const response = await axios.get(
-        `https://localhost:7205/api/user/search`,
+        `https://localhost:7205/api/user/searchByEmail`,
         {
           params: { email: query },
+          withCredentials: true,
         }
       );
       setUsers(response.data);
