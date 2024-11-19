@@ -9,5 +9,6 @@ namespace Web.Core.IRepositories
         Task DeleteConnectionAsync(string connectionId);
 
         Task<IEnumerable<string>?> ReadAllConnectionsAsync(Guid userId);
+        Task<IEnumerable<string>?> ReadConnectionsByGroupIdAsync(Guid groupId);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Web.Application.Dto_s.User;
 
-namespace Web.Application.Interfaces.IServices
+namespace Web.Application.Services.Interfaces.IServices
 {
     public interface IUserService
     {

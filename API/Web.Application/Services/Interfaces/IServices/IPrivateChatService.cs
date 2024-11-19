@@ -1,7 +1,7 @@
 ﻿using Web.Application.Dto_s;
 using Web.Application.Dto_s.PrivateChat;
 
-namespace Web.Application.Interfaces.IServices
+namespace Web.Application.Services.Interfaces.IServices
 {
     public interface IPrivateChatService
     {

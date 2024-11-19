@@ -1,6 +1,6 @@
 ﻿using Web.Application.Dto_s.Group;
 
-namespace Web.Application.Interfaces.IServices
+namespace Web.Application.Services.Interfaces.IServices
 {
     public interface IGroupService
     {
@@ -9,11 +9,13 @@ namespace Web.Application.Interfaces.IServices
         Task<Guid> CreateAsync(CreateGroupDto group);
 
         Task DeleteAsync(Guid groupId);
-
-        Task<IEnumerable<GroupItemDto>?> GetGroupsAsync(Guid userId);
+        Task<GroupItemDto?> GetGroupAsync(Guid groupId, Guid userId);
+        Task<IEnumerable<GroupItemDto>> GetGroupsAsync(Guid userId);
 
         Task<bool> IsUserExistInGroupAsync(Guid userId, Guid groupId);
 
         Task<bool> IsUserGroupCreatorAsync(Guid userId, Guid groupId);
+
+        Task UpdateUnreadMessagesAsync(Guid groupId, Guid userId);
     }
 }

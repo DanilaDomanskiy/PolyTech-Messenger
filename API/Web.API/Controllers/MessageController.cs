@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Dto_s.Message;
+using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API.Controllers
 {
@@ -70,6 +71,19 @@ namespace Web.API.Controllers
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
                 await _messageService.DeleteAsync(messageId, currentUserId);
+                return NoContent();
+            }
+            return Unauthorized();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveMessage([FromBody] SaveMessageDto saveMessageDto)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                saveMessageDto.SenderId = currentUserId;
+                await _messageService.SaveMessageAsync(saveMessageDto);
                 return NoContent();
             }
             return Unauthorized();

@@ -1,4 +1,4 @@
-﻿using Web.Application.Interfaces.IServices;
+﻿using Web.Application.Services.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -31,6 +31,11 @@ namespace Web.Application.Services
         public async Task<IEnumerable<string>?> GetConnectionsByChatIdAsync(Guid chatId)
         {
             return await _userConnectionRepository.ReadConnectionsByChatIdAsync(chatId);
+        }
+
+        public async Task<IEnumerable<string>?> GetConnectionsByGroupIdAsync(Guid groupId)
+        {
+            return await _userConnectionRepository.ReadConnectionsByGroupIdAsync(groupId);
         }
 
         public async Task<IEnumerable<string>?> GetAllConnectionsAsync(Guid userId)

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text;
-using Web.Application.Interfaces;
+using Web.Application.Services.Interfaces;
 
 namespace Web.Infrastructure
 {

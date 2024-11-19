@@ -1,4 +1,4 @@
-﻿namespace Web.Application.Interfaces
+﻿namespace Web.Application.Services.Interfaces
 {
     public interface ICasheProvider
     {

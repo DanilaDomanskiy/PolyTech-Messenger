@@ -20,9 +20,7 @@ namespace Web.Persistence.Repositories
                     Id = pc.Id,
                     Users = pc.Users.Where(user => user.Id != userId).ToList(),
                     Messages = pc.Messages.OrderByDescending(m => m.Timestamp).Take(1).ToList(),
-                    UnreadMessages = pc.UnreadMessages
-                        .Where(um => um.UserId == userId)
-                        .ToList()
+                    UnreadMessages = pc.UnreadMessages.Where(um => um.UserId == userId).ToList()
                 })
                 .ToListAsync();
         }

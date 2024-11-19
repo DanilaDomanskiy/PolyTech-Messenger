@@ -21,12 +21,10 @@ namespace Web.Persistence.Repositories
 
         public async Task<IEnumerable<string>?> ReadConnectionsByChatIdAsync(Guid chatId)
         {
-            var connectionIds = await _context.UserConnections
+            return await _context.UserConnections
                 .Where(uc => uc.User.IsActive && uc.User.PrivateChats.Any(pc => pc.Id == chatId))
                 .Select(uc => uc.ConnectionId)
                 .ToListAsync();
-
-            return connectionIds;
         }
 
         public async Task DeleteConnectionAsync(string connectionId)
@@ -57,15 +55,21 @@ namespace Web.Persistence.Repositories
 
         public async Task<IEnumerable<string>?> ReadAllConnectionsAsync(Guid userId)
         {
-            var connectionIds = await _context.UserConnections
+            return await _context.UserConnections
                 .Where(uc => uc.User.IsActive && uc.UserId != userId &&
                              (uc.User.PrivateChats.Any(pc => pc.Users.Any(u => u.Id == userId)) ||
                               uc.User.Groups.Any(g => g.Users.Any(u => u.Id == userId))))
                 .Select(uc => uc.ConnectionId)
                 .Distinct()
                 .ToListAsync();
+        }
 
-            return connectionIds;
+        public async Task<IEnumerable<string>?> ReadConnectionsByGroupIdAsync(Guid groupId)
+        {
+            return await _context.UserConnections
+                .Where(uc => uc.User.IsActive && uc.User.Groups.Any(g => g.Id == groupId))
+                .Select(uc => uc.ConnectionId)
+                .ToListAsync();
         }
     }
 }

@@ -1,8 +1,6 @@
-﻿using Web.Core.Entities;
-
-namespace Web.Core.IRepositories
+﻿namespace Web.Application.Services.Interfaces.IServices
 {
-    public interface IUnreadMessagesRepository : IBaseRepository<UnreadMessages>
+    public interface IUnreadMessagesService
     {
         Task СlearGroupUnreadMessagesAsync(Guid userId, Guid groupId);
 

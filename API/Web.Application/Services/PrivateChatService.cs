@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s;
 using Web.Application.Dto_s.PrivateChat;
-using Web.Application.Interfaces;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces;
+using Web.Application.Services.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -37,7 +37,7 @@ namespace Web.Application.Services
             {
                 var otherUser = chat.Users.FirstOrDefault(user => user.Id != currentUserId);
 
-                var lastMessage = chat.Messages.LastOrDefault();
+                var lastMessage = chat.Messages.FirstOrDefault();
 
                 if (lastMessage != null)
                 {

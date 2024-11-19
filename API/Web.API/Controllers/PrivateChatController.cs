@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Web.Application.Dto_s.Message;
 using Web.Application.Dto_s.PrivateChat;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API.Controllers
 {

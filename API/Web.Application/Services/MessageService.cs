@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s.Message;
-using Web.Application.Interfaces;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces;
+using Web.Application.Services.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 

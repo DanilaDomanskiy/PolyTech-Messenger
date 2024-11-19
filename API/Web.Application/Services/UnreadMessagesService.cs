@@ -1,4 +1,4 @@
-﻿using Web.Application.Interfaces.IServices;
+﻿using Web.Application.Services.Interfaces.IServices;
 using Web.Core.IRepositories;
 
 namespace Web.Application.Services
@@ -12,9 +12,14 @@ namespace Web.Application.Services
             _unreadMessagesRepository = unreadMessagesRepository;
         }
 
-        public async Task СlearUnreadMessagesAsync(Guid userId, Guid? privateChatId = null, Guid? groupId = null)
+        public async Task СlearGroupUnreadMessagesAsync(Guid userId, Guid groupId)
         {
-            await _unreadMessagesRepository.СlearUnreadMessagesAsync(userId, privateChatId, groupId);
+            await _unreadMessagesRepository.СlearGroupUnreadMessagesAsync(userId, groupId);
+        }
+
+        public async Task СlearPrivateChatUnreadMessagesAsync(Guid userId, Guid privateChatId)
+        {
+            await _unreadMessagesRepository.СlearPrivateChatUnreadMessagesAsync(userId, privateChatId);
         }
     }
 }

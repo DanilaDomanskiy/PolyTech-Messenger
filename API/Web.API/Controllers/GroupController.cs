@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Application.Dto_s.Group;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API.Controllers
 {
@@ -74,6 +74,23 @@ namespace Web.API.Controllers
                     return NoContent();
                 }
                 return Forbid();
+            }
+            return Unauthorized();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadGroup(Guid groupId)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                var isUserExist = await _groupService.IsUserExistInGroupAsync(currentUserId, groupId);
+                if (!isUserExist)
+                {
+                    return Forbid();
+                }
+                var chat = await _groupService.GetGroupAsync(groupId, currentUserId);
+                return Ok(chat);
             }
             return Unauthorized();
         }

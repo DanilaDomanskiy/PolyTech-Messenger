@@ -1,4 +1,4 @@
-﻿namespace Web.Application.Dto_s
+﻿namespace Web.Application.Dto_s.PrivateChat
 {
     public class PrivateChatItemDto
     {

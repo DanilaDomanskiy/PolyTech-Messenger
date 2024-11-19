@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Web.Application.Dto_s.Message;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API
 {
@@ -11,39 +11,61 @@ namespace Web.API
         private readonly IUserConnectionService _userConnectionService;
         private readonly IPrivateChatService _privateChatService;
         private readonly IUnreadMessagesService _unreadMessagesService;
+        private readonly IUserService _userService;
+        private readonly IGroupService _groupService;
 
         public ChatHub(
             IMessageService messageService,
             IHttpContextAccessor httpContextAccessor,
             IUserConnectionService userConnectionService,
             IPrivateChatService privateChatService,
-            IUnreadMessagesService unreadMessagesService)
+            IUnreadMessagesService unreadMessagesService,
+            IUserService userService,
+            IGroupService groupService)
         {
             _messageService = messageService;
             _httpContextAccessor = httpContextAccessor;
             _userConnectionService = userConnectionService;
             _privateChatService = privateChatService;
             _unreadMessagesService = unreadMessagesService;
+            _userService = userService;
+            _groupService = groupService;
         }
 
-        public async Task JoinAsync(string chatName)
+        public async Task JoinPrivateChatAsync(Guid privateChatId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, chatName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
         }
 
-        public async Task LeaveAsync(string chatName)
+        public async Task LeavePrivateChatAsync(Guid privateChatId)
         {
             var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
                 .FirstOrDefault(x => x.Type == "userId")?.Value;
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
-                string guidString = chatName.Replace("pc", "");
-                var guid = Guid.Parse(guidString);
-                await _unreadMessagesService.СlearUnreadMessagesAsync(userId, guid, null);
+                await _unreadMessagesService.СlearPrivateChatUnreadMessagesAsync(userId, privateChatId);
             }
 
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatName);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
+        }
+
+        public async Task JoinGroupAsync(Guid groupId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
+        }
+
+        public async Task LeaveGroupAsync(Guid groupId)
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
+                .FirstOrDefault(x => x.Type == "userId")?.Value;
+
+            if (Guid.TryParse(userIdClaim, out Guid userId))
+            {
+                await _unreadMessagesService.СlearGroupUnreadMessagesAsync(userId, groupId);
+            }
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
         }
 
         public async Task ConnectAsync()
@@ -90,6 +112,8 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                if (!await _privateChatService.IsUserExistInChatAsync(userId, model.PrivateChatId)) return;
+
                 var message = new SaveMessageDto
                 {
                     Content = model.Content,
@@ -100,10 +124,15 @@ namespace Web.API
 
                 var messageId = await _messageService.SaveMessageAsync(message);
 
-                var privateChat = "pc" + model.PrivateChatId;
+                var dto = new ReceiveChatMessageDto
+                {
+                    Id = messageId,
+                    Content = model.Content,
+                    Timestamp = model.Timestamp,
+                    SenderId = userId
+                };
 
-                await Clients.GroupExcept(privateChat, Context.ConnectionId)
-                    .SendAsync("ReceiveMessage", userId, model.Content, model.Timestamp);
+                await Clients.GroupExcept("pc" + model.PrivateChatId, Context.ConnectionId).SendAsync("ReceivePrivateChatMessage", dto);
 
                 var usersConnections = await _userConnectionService.GetConnectionsByChatIdAsync(model.PrivateChatId);
 
@@ -113,8 +142,7 @@ namespace Web.API
                     {
                         if (connection != Context.ConnectionId)
                         {
-                            await Clients.Client(connection)
-                                .SendAsync("ReceiveMessages", userId, model.Content, model.Timestamp, model.PrivateChatId);
+                            await Clients.Client(connection).SendAsync("ReceivePrivateChatMessages", model.PrivateChatId, dto);
                         }
                     }
                 }
@@ -130,6 +158,48 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                if (!await _groupService.IsUserExistInGroupAsync(userId, model.GroupId)) return;
+
+                var message = new SaveMessageDto
+                {
+                    Content = model.Content,
+                    SenderId = userId,
+                    Timestamp = model.Timestamp,
+                    GroupId = model.GroupId,
+                };
+
+                var messageId = await _messageService.SaveMessageAsync(message);
+                var user = await _userService.GetUserAsync(userId);
+                var dto = new ReceiveGroupMessageDto
+                {
+                    Id = messageId,
+                    Content = model.Content,
+                    Timestamp = model.Timestamp,
+                    GroupId = model.GroupId,
+                    Sender = new Sender
+                    {
+                        Id = userId,
+                        Name = user?.Name,
+                        ProfileImagePath = user?.ProfileImagePath,
+                    }
+                };
+
+                await Clients.GroupExcept("g" + model.GroupId, Context.ConnectionId).SendAsync("ReceiveGroupMessage", dto);
+
+                var usersConnections = await _userConnectionService.GetConnectionsByGroupIdAsync(model.GroupId);
+
+                if (usersConnections?.Any() == true)
+                {
+                    foreach (var connection in usersConnections)
+                    {
+                        if (connection != Context.ConnectionId)
+                        {
+                            await Clients.Client(connection).SendAsync("ReceiveGroupMessages", model.GroupId, dto);
+                        }
+                    }
+                }
+
+                await _groupService.UpdateUnreadMessagesAsync(model.GroupId, userId);
             }
         }
     }

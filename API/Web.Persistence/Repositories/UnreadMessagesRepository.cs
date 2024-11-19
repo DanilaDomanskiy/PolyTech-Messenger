@@ -10,14 +10,25 @@ namespace Web.Persistence.Repositories
         {
         }
 
-        public async Task СlearUnreadMessagesAsync(Guid userId, Guid? privateChatId = null, Guid? groupId = null)
+        public async Task СlearPrivateChatUnreadMessagesAsync(Guid userId, Guid privateChatId)
         {
             var unreadMessages = _context.UnreadMessages
                 .AsNoTracking()
-                .FirstOrDefault(um => um.UserId == userId
-                && (privateChatId != null
-                ? um.PrivateChatId == privateChatId
-                : um.GroupId == groupId));
+                .FirstOrDefault(um => um.UserId == userId && um.PrivateChatId == privateChatId);
+
+            if (unreadMessages != null && unreadMessages.Count != 0)
+            {
+                unreadMessages.Count = 0;
+                _context.UnreadMessages.Update(unreadMessages);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task СlearGroupUnreadMessagesAsync(Guid userId, Guid groupId)
+        {
+            var unreadMessages = _context.UnreadMessages
+                .AsNoTracking()
+                .FirstOrDefault(um => um.UserId == userId && um.GroupId == groupId);
 
             if (unreadMessages != null && unreadMessages.Count != 0)
             {

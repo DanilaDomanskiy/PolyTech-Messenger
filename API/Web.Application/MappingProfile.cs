@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Web.Application.Dto_s;
 using Web.Application.Dto_s.Group;
 using Web.Application.Dto_s.Message;
+using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Dto_s.User;
 using Web.Core.Entities;
 
@@ -21,7 +21,7 @@ namespace Web.Application
             CreateMap<User, CurrentUserDto>();
             CreateMap<CreateGroupDto, Group>();
             CreateMap<User, SecondUser>();
-            CreateMap<Message, LastMessage>();
+            CreateMap<Message, Dto_s.PrivateChat.LastMessage>();
             CreateMap<Group, GroupItemDto>();
         }
     }

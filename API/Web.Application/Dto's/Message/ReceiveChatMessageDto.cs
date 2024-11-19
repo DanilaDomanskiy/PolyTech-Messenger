@@ -1,9 +1,10 @@
 ﻿namespace Web.Application.Dto_s.Message
 {
-    public class SendGroupMessageDto
+    public class ReceiveChatMessageDto
     {
-        public Guid GroupId { get; set; }
+        public Guid Id { get; set; }
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
+        public Guid SenderId { get; set; }
     }
 }

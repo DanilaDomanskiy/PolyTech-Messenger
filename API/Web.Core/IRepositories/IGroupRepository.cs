@@ -6,10 +6,14 @@ namespace Web.Core.IRepositories
     {
         Task AddUserToGroupAsync(Guid userId, Guid groupId);
 
-        Task<IEnumerable<Group>?> GetGroupsAsync(Guid userId);
+        Task<IEnumerable<Group>?> ReadGroupsAsync(Guid userId);
 
         Task<bool> IsUserExistInGroupAsync(Guid userId, Guid groupId);
 
         Task<bool> IsUserGroupCreatorAsync(Guid userId, Guid groupId);
+
+        Task UpdateUnreadMessagesAsync(Guid groupId, Guid userId);
+
+        Task<Group?> ReadGroupAsync(Guid groupId, Guid userId);
     }
 }

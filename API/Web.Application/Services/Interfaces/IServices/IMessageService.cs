@@ -1,6 +1,6 @@
 ﻿using Web.Application.Dto_s.Message;
 
-namespace Web.Application.Interfaces.IServices
+namespace Web.Application.Services.Interfaces.IServices
 {
     public interface IMessageService
     {

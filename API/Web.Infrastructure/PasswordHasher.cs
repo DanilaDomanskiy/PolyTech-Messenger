@@ -1,4 +1,4 @@
-﻿using Web.Application.Interfaces;
+﻿using Web.Application.Services.Interfaces;
 
 namespace Web.Infrastructure
 {
