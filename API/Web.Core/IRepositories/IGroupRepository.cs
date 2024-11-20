@@ -15,5 +15,11 @@ namespace Web.Core.IRepositories
         Task UpdateUnreadMessagesAsync(Guid groupId, Guid userId);
 
         Task<Group?> ReadGroupAsync(Guid groupId, Guid userId);
+
+        Task DeleteUserFromGroupAsync(Guid userId, Guid groupId);
+
+        Task<IEnumerable<User>?> ReadGroupUsersAsync(Guid groupId);
+
+        Task UpdateNameAsync(Guid groupId, string name);
     }
 }

@@ -48,6 +48,7 @@ namespace Web.Persistence.Repositories
             if (!hasOtherConnections)
             {
                 user.IsActive = false;
+                user.LastActive = DateTime.UtcNow;
             }
 
             await _context.SaveChangesAsync();

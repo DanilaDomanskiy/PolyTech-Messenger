@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s.Group;
+using Web.Application.Dto_s.User;
 using Web.Application.Services.Interfaces;
 using Web.Application.Services.Interfaces.IServices;
 using Web.Core.Entities;
@@ -26,9 +27,14 @@ namespace Web.Application.Services
             return await _groupRepository.CreateAsync(group);
         }
 
-        public async Task AddUserAsync(AddUserToGroupDto dto)
+        public async Task AddUserAsync(GroupUserDto dto)
         {
             await _groupRepository.AddUserToGroupAsync(dto.UserId, dto.GropId);
+        }
+
+        public async Task DeleteUserAsync(GroupUserDto dto)
+        {
+            await _groupRepository.DeleteUserFromGroupAsync(dto.UserId, dto.GropId);
         }
 
         public async Task<bool> IsUserGroupCreatorAsync(Guid userId, Guid groupId)
@@ -115,6 +121,17 @@ namespace Web.Application.Services
         public async Task UpdateUnreadMessagesAsync(Guid groupId, Guid userId)
         {
             await _groupRepository.UpdateUnreadMessagesAsync(groupId, userId);
+        }
+
+        public async Task<IEnumerable<SearchUserDto>?> GetGroupUsersAsync(Guid groupId)
+        {
+            var users = await _groupRepository.ReadGroupUsersAsync(groupId);
+            return _mapper.Map<IEnumerable<SearchUserDto>>(users);
+        }
+
+        public async Task ChangeGroupNameAsync(GroupNameDto groupNameDto)
+        {
+            await _groupRepository.UpdateNameAsync(groupNameDto.GroupId, groupNameDto.Name);
         }
     }
 }

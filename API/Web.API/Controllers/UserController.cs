@@ -93,7 +93,7 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpPut("profileImage")]
+        [HttpPatch("profileImage")]
         public async Task<IActionResult> UpdateProfileImage(IFormFile file)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -157,6 +157,52 @@ namespace Web.API.Controllers
                     return NotFound();
                 }
                 return Ok(user);
+            }
+            return Unauthorized();
+        }
+
+        [Authorize]
+        [HttpGet("noGroupUsers")]
+        public async Task<IActionResult> GetNoGroupUsers(string email, Guid groupId)
+        {
+            var users = await _userService.GetNoGroupUsersAsync(email, groupId);
+            return Ok(users);
+        }
+
+        [Authorize]
+        [HttpPatch("name")]
+        public async Task<IActionResult> UpdateName([FromBody] string name)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                if (name.Length > 30 || name.Length == 0) return ValidationProblem();
+                await _userService.UpdateUserNameAsync(currentUserId, name);
+                return NoContent();
+            }
+            return Unauthorized();
+        }
+
+        [Authorize]
+        [HttpPatch("password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDto updatePasswordDto)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                try
+                {
+                    await _userService.UpdateUserPasswordAsync(currentUserId, updatePasswordDto);
+                    if (Request.Cookies.ContainsKey("AppCookie"))
+                    {
+                        Response.Cookies.Delete("AppCookie");
+                    }
+                    return NoContent();
+                }
+                catch (InvalidOperationException)
+                {
+                    return StatusCode(409);
+                }
             }
             return Unauthorized();
         }

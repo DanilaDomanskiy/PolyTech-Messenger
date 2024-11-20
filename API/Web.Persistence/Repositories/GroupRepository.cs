@@ -160,5 +160,37 @@ namespace Web.Persistence.Repositories
                 })
                 .FirstOrDefaultAsync();
         }
+
+        public async Task DeleteUserFromGroupAsync(Guid userId, Guid groupId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null) return;
+
+            var group = await _context.Groups
+                .Include(g => g.Users)
+                .FirstOrDefaultAsync(g => g.Id == groupId);
+
+            if (group == null || !group.Users.Any(u => u.Id == userId) || group.CreatorId == userId)
+            {
+                return;
+            }
+            group.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<User>?> ReadGroupUsersAsync(Guid groupId)
+        {
+            var group = await _context.Groups.FindAsync(groupId);
+            return group?.Users;
+        }
+
+        public async Task UpdateNameAsync(Guid groupId, string name)
+        {
+            var group = await _context.Groups.FindAsync(groupId);
+            if (group == null) return;
+            group.Name = name;
+            await _context.SaveChangesAsync();
+        }
     }
 }

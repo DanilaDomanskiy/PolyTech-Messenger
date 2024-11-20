@@ -6,10 +6,12 @@ using StackExchange.Redis;
 using System.Text;
 using Web.API;
 using Web.Application;
+using Web.Application.Dto_s.Group;
 using Web.Application.Dto_s.User;
 using Web.Application.Services;
 using Web.Application.Services.Interfaces;
 using Web.Application.Services.Interfaces.IServices;
+using Web.Application.Validators.Group;
 using Web.Application.Validators.User;
 using Web.Core.IRepositories;
 using Web.Infrastructure;
@@ -88,6 +90,8 @@ builder.Services.AddScoped<IUnreadMessagesRepository, UnreadMessagesRepository>(
 builder.Services.AddScoped<IUnreadMessagesService, UnreadMessagesService>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+builder.Services.AddScoped<IValidator<GroupNameDto>, GroupNameDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdatePasswordDto>, UpdatePasswordDtoValidator>();
 
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();

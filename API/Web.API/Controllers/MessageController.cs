@@ -84,7 +84,7 @@ namespace Web.API.Controllers
             {
                 saveMessageDto.SenderId = currentUserId;
                 await _messageService.SaveMessageAsync(saveMessageDto);
-                return NoContent();
+                return Created();
             }
             return Unauthorized();
         }
