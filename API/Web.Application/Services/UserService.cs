@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Web.Application.Dto_s.User;
-using Web.Application.Interfaces;
-using Web.Application.Interfaces.IServices;
+using Web.Application.Services.Interfaces;
+using Web.Application.Services.Interfaces.IServices;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -40,21 +40,19 @@ namespace Web.Application.Services
 
         public async Task<string?> LoginUserAsync(AuthUserDto userDTO)
         {
-            var user = await _userRepository.ReadAsyncByEmail(userDTO.Login);
+            var user = await _userRepository.ReadByEmailAsync(userDTO.Login);
 
             if (user == null || !_passwordHasher.Verify(userDTO.Password, user.PasswordHash))
             {
                 return null;
             }
 
-            var token = _jwtProvider.GenerateToken(user);
-
-            return token;
+            return _jwtProvider.GenerateToken(user);
         }
 
         public async Task<IEnumerable<SearchUserDto>?> SearchByEmailAsync(string email, Guid currentUserId)
         {
-            var users = await _userRepository.ReadAsyncByEmailLetters(email, currentUserId);
+            var users = await _userRepository.ReadByEmailLettersAsync(email, currentUserId);
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
@@ -63,7 +61,7 @@ namespace Web.Application.Services
             var user = await _userRepository.ReadAsync(userId);
             if (user != null)
             {
-                user.ProfilePicturePath = filePath;
+                user.ProfileImagePath = filePath;
                 await _userRepository.UpdateAsync(user);
             }
         }
@@ -72,6 +70,29 @@ namespace Web.Application.Services
         {
             var user = await _userRepository.ReadAsync(userId);
             return _mapper.Map<CurrentUserDto>(user);
+        }
+
+        public async Task<IEnumerable<SearchUserDto>?> GetNoGroupUsersAsync(string email, Guid groupId)
+        {
+            var users = await _userRepository.ReadNoGroupUsersAsync(email, groupId);
+            return _mapper.Map<IEnumerable<SearchUserDto>>(users);
+        }
+
+        public async Task UpdateUserNameAsync(Guid userId, string name)
+        {
+            await _userRepository.UpdateNameAsync(userId, name);
+        }
+
+        public async Task UpdateUserPasswordAsync(Guid currentUserId, UpdatePasswordDto updatePasswordDto)
+        {
+            var user = await _userRepository.ReadAsync(currentUserId);
+
+            if (user == null || !_passwordHasher.Verify(updatePasswordDto.OldPassword, user.PasswordHash))
+            {
+                throw new InvalidOperationException();
+            }
+            var passwordHash = _passwordHasher.Generate(updatePasswordDto.NewPassword);
+            await _userRepository.UpdatePasswordAsync(currentUserId, passwordHash);
         }
     }
 }

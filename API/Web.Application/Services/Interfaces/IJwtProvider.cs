@@ -1,6 +1,6 @@
 ﻿using Web.Core.Entities;
 
-namespace Web.Application.Interfaces
+namespace Web.Application.Services.Interfaces
 {
     public interface IJwtProvider
     {

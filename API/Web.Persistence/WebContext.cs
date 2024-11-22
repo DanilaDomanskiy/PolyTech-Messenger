@@ -18,6 +18,8 @@ namespace Web.Persistence
         public DbSet<Group> Groups { get; set; }
         public DbSet<PrivateChat> PrivateChats { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<UserConnection> UserConnections { get; set; }
+        public DbSet<UnreadMessages> UnreadMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -31,6 +33,8 @@ namespace Web.Persistence
             modelBuilder.ApplyConfiguration(new GroupConfiguration());
             modelBuilder.ApplyConfiguration(new PrivateChatConfiguration());
             modelBuilder.ApplyConfiguration(new MessageConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConnectionConfiguration());
+            modelBuilder.ApplyConfiguration(new UnreadMessagesConfiguration());
         }
     }
 }

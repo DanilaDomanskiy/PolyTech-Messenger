@@ -6,8 +6,12 @@ namespace Web.Core.IRepositories
     {
         Task<bool> IsUserExistsAsync(string email);
 
-        Task<User?> ReadAsyncByEmail(string email);
+        Task<User?> ReadByEmailAsync(string email);
 
-        Task<IEnumerable<User>?> ReadAsyncByEmailLetters(string email, Guid Id);
+        Task<IEnumerable<User>?> ReadByEmailLettersAsync(string email, Guid Id);
+
+        Task<IEnumerable<User>?> ReadNoGroupUsersAsync(string email, Guid groupId);
+        Task UpdateNameAsync(Guid userId, string name);
+        Task UpdatePasswordAsync(Guid currentUserId, string passwordHash);
     }
 }

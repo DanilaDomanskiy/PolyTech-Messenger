@@ -10,35 +10,28 @@ namespace Web.Persistence.Configurations
         {
             builder.HasKey(m => m.Id);
 
-            builder
-               .Property(m => m.Content)
-               .IsRequired()
-               .HasMaxLength(5000);
+            builder.Property(m => m.Content)
+                .IsRequired()
+                .HasMaxLength(5000);
 
-            builder
-                .Property(m => m.Timestamp)
+            builder.Property(m => m.Timestamp)
                 .IsRequired();
 
             builder.HasIndex(m => m.Timestamp);
 
-            builder
-                .HasOne(m => m.Sender)
-                .WithMany(s => s.SentMessages)
+            builder.HasOne(m => m.Sender)
+                .WithMany(u => u.SentMessages)
                 .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(m => m.SenderId);
-
-            builder
-                .HasOne(m => m.Group)
+            builder.HasOne(m => m.Group)
                 .WithMany(g => g.Messages)
                 .HasForeignKey(m => m.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(m => m.GroupId);
 
-            builder
-                .HasOne(m => m.PrivateChat)
+            builder.HasOne(m => m.PrivateChat)
                 .WithMany(pc => pc.Messages)
                 .HasForeignKey(m => m.PrivateChatId)
                 .OnDelete(DeleteBehavior.Cascade);

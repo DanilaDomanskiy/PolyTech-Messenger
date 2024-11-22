@@ -8,28 +8,20 @@ namespace Web.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Group> builder)
         {
-            builder.HasKey(m => m.Id);
+            builder.HasKey(g => g.Id);
 
-            builder
-                .Property(m => m.Name)
+            builder.Property(g => g.Name)
                 .IsRequired()
+                .HasMaxLength(30);
+
+            builder.Property(g => g.ImagePath)
+                .IsRequired(false)
                 .HasMaxLength(100);
 
-            builder
-                .HasOne(g => g.Creator)
+            builder.HasOne(g => g.Creator)
                 .WithMany()
                 .HasForeignKey(g => g.CreatorId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder
-                .HasMany(g => g.Users)
-                .WithMany(u => u.Groups);
-
-            builder
-                .HasMany(g => g.Messages)
-                .WithOne(m => m.Group)
-                .HasForeignKey(m => m.GroupId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
