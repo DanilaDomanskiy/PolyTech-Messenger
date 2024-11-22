@@ -1,68 +1,69 @@
 .chat-page {
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
-  height: 100vh;
+  border-radius: 0; /* Убираем радиус, чтобы занять весь экран */
+  height: 100vh; /* Полная высота экрана */
+  width: 100vw; /* Полная ширина экрана */
   background-color: rgb(235, 235, 235);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  width: 80vw;
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow: hidden;
+  box-shadow: none; /* Убираем тень */
+  margin: 0; /* Убираем отступы */
+  position: fixed; /* Фиксируем элемент */
+  top: 0;
+  left: 0;
+  overflow: hidden; /* Убираем прокрутку страницы */
 }
 
 .chat-header {
   background-color: #2c804c;
-  border-radius: 18px 18px 0 0;
-  padding: 10px;
+  padding: 15px;
   color: white;
   text-align: center;
-  font-size: 18px;
+  font-size: 24px; /* Увеличенный размер текста для заголовка */
   font-weight: bold;
 }
 
 .chat-messages {
   flex: 1;
   padding: 20px;
-  overflow-y: auto;
+  overflow-y: auto; /* Прокрутка только для области сообщений */
   display: flex;
   flex-direction: column;
-  gap: 10px; /* расстояние между сообщениями */
+  gap: 12px; /* Расстояние между сообщениями */
 }
 
 .message {
   margin-bottom: 10px;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 18px 18px 0 18px;
-  max-width: 60%;
+  max-width: 70%; /* Ограничиваем ширину сообщений */
   word-wrap: break-word;
-  line-height: 1.4;
-  position: relative;
+  line-height: 1.6;
+  font-size: 16px; /* Увеличенный шрифт */
 }
 
 .my-message {
   background-color: #2c804c;
   color: white;
   align-self: flex-end;
-  border-radius: 18px 18px 18px 0; /* измененный угол для пользовательского сообщения */
+  border-radius: 18px 18px 18px 0; /* Угол для пользовательских сообщений */
 }
 
 .other-message {
   background-color: #f0f0f0;
   align-self: flex-start;
-  border-radius: 18px 18px 0 18px; /* измененный угол для сообщения другого пользователя */
+  border-radius: 18px 18px 0 18px; /* Угол для сообщений другого пользователя */
 }
 
 .chat-input {
   display: flex;
-  padding: 10px;
+  padding: 15px;
   border-top: 1px solid #ddd;
   background-color: #fff;
 }
 
 .chat-input input {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
   outline: none;
@@ -78,11 +79,12 @@
   background-color: #2c804c;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 25px;
   margin-left: 10px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 16px; /* Увеличенный текст кнопки */
   transition: background-color 0.3s;
 }
 
