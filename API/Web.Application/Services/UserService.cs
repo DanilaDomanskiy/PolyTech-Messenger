@@ -56,9 +56,10 @@ namespace Web.Application.Services
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task UpdateProfileAsync(string filePath, Guid userId)
+        public async Task UpdateProfileImageAsync(Guid userId, string? filePath)
         {
             var user = await _userRepository.ReadAsync(userId);
+
             if (user != null)
             {
                 user.ProfileImagePath = filePath;
@@ -78,12 +79,18 @@ namespace Web.Application.Services
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task UpdateUserNameAsync(Guid userId, string name)
+        public async Task UpdateUserNameAsync(Guid userId, UserNameDto userNameDto)
         {
-            await _userRepository.UpdateNameAsync(userId, name);
+            var user = await _userRepository.ReadAsync(userId);
+
+            if (user != null)
+            {
+                user.Name = userNameDto.Name;
+                await _userRepository.UpdateAsync(user);
+            }
         }
 
-        public async Task UpdateUserPasswordAsync(Guid currentUserId, UpdatePasswordDto updatePasswordDto)
+        public async Task UpdateUserPasswordAsync(Guid currentUserId, UserPasswordDto updatePasswordDto)
         {
             var user = await _userRepository.ReadAsync(currentUserId);
 
@@ -92,7 +99,8 @@ namespace Web.Application.Services
                 throw new InvalidOperationException();
             }
             var passwordHash = _passwordHasher.Generate(updatePasswordDto.NewPassword);
-            await _userRepository.UpdatePasswordAsync(currentUserId, passwordHash);
+            user.PasswordHash = passwordHash;
+            await _userRepository.UpdateAsync(user);
         }
     }
 }

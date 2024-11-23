@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Application.Dto_s.Group;
+using Web.Application.Services;
 using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API.Controllerss
@@ -20,17 +21,12 @@ namespace Web.API.Controllerss
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGroup([FromBody] string groupName)
+        public async Task<IActionResult> CreateGroup([FromBody] CreateGroupDto createGroupDto)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                var group = new CreateGroupDto
-                {
-                    CreatorId = currentUserId,
-                    Name = groupName
-                };
-                var groupId = await _groupService.CreateAsync(group);
+                var groupId = await _groupService.CreateAsync(currentUserId, createGroupDto);
                 return Ok(groupId);
             }
             return Unauthorized();
@@ -80,7 +76,7 @@ namespace Web.API.Controllerss
             return Unauthorized();
         }
 
-        [HttpDelete("/{groupId}")]
+        [HttpDelete("{groupId}")]
         public async Task<IActionResult> DeleteAsync(Guid groupId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -96,7 +92,7 @@ namespace Web.API.Controllerss
             return Unauthorized();
         }
 
-        [HttpGet]
+        [HttpGet("{groupId}")]
         public async Task<IActionResult> ReadGroup(Guid groupId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -113,7 +109,7 @@ namespace Web.API.Controllerss
             return Unauthorized();
         }
 
-        [HttpGet("users")]
+        [HttpGet("users/{groupId}")]
         public async Task<IActionResult> ReadGroupUsers(Guid groupId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -141,6 +137,61 @@ namespace Web.API.Controllerss
             return PhysicalFile(fileFullPath, "application/octet-stream");
         }
 
+        [HttpPatch("image/{groupId}")]
+        public async Task<IActionResult> UpdateGroupImage(Guid groupId, IFormFile? file)
+        {
+            var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
+            if (Guid.TryParse(userIdClaim, out Guid currentUserId))
+            {
+                if (!await _groupService.IsUserGroupCreatorAsync(currentUserId, groupId))
+                {
+                    return Forbid();
+                }
+
+                string? oldFile;
+
+                if (file == null || file.Length == 0)
+                {
+                    oldFile = Directory.GetFiles(Path.Combine(_folderPath, "group-images"), $"{currentUserId}.*")
+                        .FirstOrDefault();
+                    if (oldFile != null) System.IO.File.Delete(oldFile);
+                    await _groupService.UpdateGroupImageAsync(groupId, null);
+                    return Created();
+                }
+                else
+                {
+                    if (file.Length > 5 * 1024 * 1024) return StatusCode(409);
+
+                    try
+                    {
+                        using var image = SixLabors.ImageSharp.Image.Load(file.OpenReadStream());
+                    }
+                    catch (SixLabors.ImageSharp.UnknownImageFormatException)
+                    {
+                        return StatusCode(409);
+                    }
+                }
+
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                var path = $"group-images/{currentUserId}{extension}";
+                var filePath = Path.Combine(_folderPath, path);
+
+                oldFile = Directory.GetFiles(Path.Combine(_folderPath, "group-images"), $"{currentUserId}.*")
+                    .FirstOrDefault();
+                if (oldFile != null) System.IO.File.Delete(oldFile);
+
+                using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                await _groupService.UpdateGroupImageAsync(groupId, path);
+
+                return Created();
+            }
+            return Unauthorized();
+        }
+
         [HttpPatch("name")]
         public async Task<IActionResult> UpdateGroupName([FromBody] GroupNameDto groupNameDto)
         {
@@ -149,7 +200,7 @@ namespace Web.API.Controllerss
             {
                 if (await _groupService.IsUserGroupCreatorAsync(currentUserId, groupNameDto.GroupId))
                 {
-                    await _groupService.ChangeGroupNameAsync(groupNameDto);
+                    await _groupService.UpdateGroupNameAsync(groupNameDto);
                     return NoContent();
                 }
                 return Forbid();

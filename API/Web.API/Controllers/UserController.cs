@@ -68,7 +68,7 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("searchByEmail")]
+        [HttpGet("search")]
         public async Task<IActionResult> SearchByEmail(string email)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -93,47 +93,58 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpPatch("profileImage")]
-        public async Task<IActionResult> UpdateProfileImage(IFormFile file)
+        [HttpPatch("profile-image")]
+        public async Task<IActionResult> UpdateProfileImage(IFormFile? file)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+                string? oldFile;
+
+                if (file == null || file.Length == 0)
+                {
+                    oldFile = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*")
+                        .FirstOrDefault();
+                    if (oldFile != null) System.IO.File.Delete(oldFile);
+                    await _userService.UpdateProfileImageAsync(currentUserId, null);
+                    return Created();
+                }
+                else
+                {
+                    if (file.Length > 5 * 1024 * 1024) return StatusCode(409);
+
+                    try
+                    {
+                        using var image = SixLabors.ImageSharp.Image.Load(file.OpenReadStream());
+                    }
+                    catch (SixLabors.ImageSharp.UnknownImageFormatException)
+                    {
+                        return StatusCode(409);
+                    }
+                }
+
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-                var validContentTypes = new[] { "image/jpg", "image/jpeg", "image/png", "image/gif", "image/bmp" };
-                var contentType = file.ContentType.ToLowerInvariant();
-
-                if (!validExtensions.Contains(extension) || !validContentTypes.Contains(contentType))
-                {
-                    return StatusCode(409);
-                }
-
-                var oldFiles = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*");
-
-                foreach (var oldFile in oldFiles)
-                {
-                    System.IO.File.Delete(oldFile);
-                }
-
                 var path = $"profile-images/{currentUserId}{extension}";
                 var filePath = Path.Combine(_folderPath, path);
+
+                oldFile = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*")
+                    .FirstOrDefault();
+                if (oldFile != null) System.IO.File.Delete(oldFile);
 
                 using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     await file.CopyToAsync(stream);
                 }
 
-                await _userService.UpdateProfileAsync(path, currentUserId);
+                await _userService.UpdateProfileImageAsync(currentUserId, path);
 
-                return NoContent();
+                return Created();
             }
             return Unauthorized();
         }
 
         [Authorize]
-        [HttpGet("profileImage")]
+        [HttpGet("profile-image")]
         public IActionResult GetProfileImage(string imagePath)
         {
             var fileFullPath = Path.Combine(_folderPath, imagePath);
@@ -162,7 +173,7 @@ namespace Web.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("noGroupUsers")]
+        [HttpGet("not-in-group/{groupId}")]
         public async Task<IActionResult> GetNoGroupUsers(string email, Guid groupId)
         {
             var users = await _userService.GetNoGroupUsersAsync(email, groupId);
@@ -171,13 +182,12 @@ namespace Web.API.Controllers
 
         [Authorize]
         [HttpPatch("name")]
-        public async Task<IActionResult> UpdateName([FromBody] string name)
+        public async Task<IActionResult> UpdateName([FromBody] UserNameDto userNameDto)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                if (name.Length > 30 || name.Length == 0) return ValidationProblem();
-                await _userService.UpdateUserNameAsync(currentUserId, name);
+                await _userService.UpdateUserNameAsync(currentUserId, userNameDto);
                 return NoContent();
             }
             return Unauthorized();
@@ -185,7 +195,7 @@ namespace Web.API.Controllers
 
         [Authorize]
         [HttpPatch("password")]
-        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDto updatePasswordDto)
+        public async Task<IActionResult> UpdatePassword([FromBody] UserPasswordDto updatePasswordDto)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))

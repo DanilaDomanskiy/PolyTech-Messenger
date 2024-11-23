@@ -24,7 +24,7 @@ namespace Web.API.Controllers
             _groupService = groupService;
         }
 
-        [HttpGet("byChatId")]
+        [HttpGet("chat/{chatId}")]
         public async Task<IActionResult> GetChatMessages(Guid chatId, int page = 1, int pageSize = 20)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -44,7 +44,7 @@ namespace Web.API.Controllers
             return Unauthorized();
         }
 
-        [HttpGet("byGroupId")]
+        [HttpGet("group/{groupId}")]
         public async Task<IActionResult> GetGroupMessages(Guid groupId, int page = 1, int pageSize = 20)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -64,7 +64,7 @@ namespace Web.API.Controllers
             return Unauthorized();
         }
 
-        [HttpDelete("/{messageId}")]
+        [HttpDelete("{messageId}")]
         public async Task<IActionResult> DeleteAsync(Guid messageId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;

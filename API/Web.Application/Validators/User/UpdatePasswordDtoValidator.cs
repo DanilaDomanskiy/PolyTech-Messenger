@@ -3,7 +3,7 @@ using Web.Application.Dto_s.User;
 
 namespace Web.Application.Validators.User
 {
-    public class UpdatePasswordDtoValidator : AbstractValidator<UpdatePasswordDto>
+    public class UpdatePasswordDtoValidator : AbstractValidator<UserPasswordDto>
     {
         public UpdatePasswordDtoValidator()
         {

@@ -19,7 +19,5 @@ namespace Web.Core.IRepositories
         Task DeleteUserFromGroupAsync(Guid userId, Guid groupId);
 
         Task<IEnumerable<User>?> ReadGroupUsersAsync(Guid groupId);
-
-        Task UpdateNameAsync(Guid groupId, string name);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Web.Application.Dto_s;
-using Web.Application.Dto_s.PrivateChat;
+﻿using Web.Application.Dto_s.PrivateChat;
 
 namespace Web.Application.Services.Interfaces.IServices
 {
@@ -7,7 +6,7 @@ namespace Web.Application.Services.Interfaces.IServices
     {
         Task<IEnumerable<PrivateChatItemDto>> GetChatsAsync(Guid userId);
 
-        Task<Guid?> CreateChatAsync(PrivateChatUsersDto model);
+        Task<Guid?> CreateChatAsync(Guid currentUserId, CreateChatDto model);
 
         Task<bool> IsUserExistInChatAsync(Guid userId, Guid privateChatId);
 

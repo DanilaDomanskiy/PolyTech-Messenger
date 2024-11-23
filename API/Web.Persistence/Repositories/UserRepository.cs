@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Text.RegularExpressions;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -35,22 +34,6 @@ namespace Web.Persistence.Repositories
             return await _context.Users
                 .Where(u => u.Email.StartsWith(email) && !u.Groups.Any(g => g.Id == groupId))
                 .ToListAsync();
-        }
-
-        public async Task UpdateNameAsync(Guid userId, string name)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return;
-            user.Name = name;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdatePasswordAsync(Guid userId, string passwordHash)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return;
-            user.PasswordHash = passwordHash;
-            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web.Application.Dto_s.Group
+namespace Web.Application.Dto_s.User
 {
-    public class GroupNameDto
+    public class UserNameDto
     {
-        public Guid GroupId { get; set; }
-
         [Required]
         [StringLength(30)]
         [MinLength(1)]

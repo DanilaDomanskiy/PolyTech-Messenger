@@ -21,9 +21,10 @@ namespace Web.Application.Services
             _encryptionService = encryptionService;
         }
 
-        public async Task<Guid> CreateAsync(CreateGroupDto groupDto)
+        public async Task<Guid> CreateAsync(Guid creatorId, CreateGroupDto groupDto)
         {
             var group = _mapper.Map<Group>(groupDto);
+            group.CreatorId = creatorId;
             return await _groupRepository.CreateAsync(group);
         }
 
@@ -129,9 +130,26 @@ namespace Web.Application.Services
             return _mapper.Map<IEnumerable<SearchUserDto>>(users);
         }
 
-        public async Task ChangeGroupNameAsync(GroupNameDto groupNameDto)
+        public async Task UpdateGroupNameAsync(GroupNameDto groupNameDto)
         {
-            await _groupRepository.UpdateNameAsync(groupNameDto.GroupId, groupNameDto.Name);
+            var group = await _groupRepository.ReadAsync(groupNameDto.GroupId);
+
+            if (group != null)
+            {
+                group.Name = groupNameDto.Name;
+                await _groupRepository.UpdateAsync(group);
+            }
+        }
+
+        public async Task UpdateGroupImageAsync(Guid groupId, string? filePath)
+        {
+            var group = await _groupRepository.ReadAsync(groupId);
+
+            if (group != null)
+            {
+                group.ImagePath = filePath;
+                await _groupRepository.UpdateAsync(group);
+            }
         }
     }
 }
