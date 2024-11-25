@@ -5,18 +5,21 @@ import SelectChat from "./pages/SelectChat/SelectChat";
 import ChatPage from "./pages/ChatPage/ChatPage";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./styles/Global.css";
+import { SignalRProvider } from "./SignalRProvider";
 
 const App = () => {
   return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Registration />} />
-        <Route path="/selectChat" element={<SelectChat />} />
-        <Route path="/chat" element={<ChatPage />} />
-      </Routes>
-    </div>
+    <SignalRProvider>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Registration />} />
+          <Route path="/selectChat" element={<SelectChat />} />
+          <Route path="/chat" element={<ChatPage />} />
+        </Routes>
+      </div>
+    </SignalRProvider>
   );
 };
 

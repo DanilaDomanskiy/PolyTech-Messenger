@@ -19,6 +19,7 @@ const ChatMessages = () => {
           }
         );
 
+        console.log(response.data);
         setChats(response.data);
       } catch (error) {
         // Обработка ошибок
@@ -54,10 +55,10 @@ const ChatMessages = () => {
           {chats.map((chat) => (
             <li
               key={chat.id}
-              onClick={() => handleChatClick(chat.id, chat.name)}
+              onClick={() => handleChatClick(chat.id, chat.secondUser.name)}
               style={{ cursor: "pointer" }}
             >
-              {chat.name}
+              {chat.secondUser.name}
             </li>
           ))}
         </ul>
