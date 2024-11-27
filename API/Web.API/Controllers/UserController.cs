@@ -46,7 +46,7 @@ namespace Web.API.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Secure = Request.IsHttps,
+                Secure = true,
                 SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddMonths(6)
             };
@@ -99,11 +99,15 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                string profileImagesFolder = Path.Combine(_folderPath, "profile-images");
+
+                Directory.CreateDirectory(profileImagesFolder);
+
                 string? oldFile;
 
                 if (file == null || file.Length == 0)
                 {
-                    oldFile = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*")
+                    oldFile = Directory.GetFiles(profileImagesFolder, $"{currentUserId}.*")
                         .FirstOrDefault();
                     if (oldFile != null) System.IO.File.Delete(oldFile);
                     await _userService.UpdateProfileImageAsync(currentUserId, null);
@@ -127,7 +131,7 @@ namespace Web.API.Controllers
                 var path = $"profile-images/{currentUserId}{extension}";
                 var filePath = Path.Combine(_folderPath, path);
 
-                oldFile = Directory.GetFiles(Path.Combine(_folderPath, "profile-images"), $"{currentUserId}.*")
+                oldFile = Directory.GetFiles(profileImagesFolder, $"{currentUserId}.*")
                     .FirstOrDefault();
                 if (oldFile != null) System.IO.File.Delete(oldFile);
 

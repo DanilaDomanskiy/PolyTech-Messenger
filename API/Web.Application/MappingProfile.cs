@@ -12,7 +12,7 @@ namespace Web.Application
         public MappingProfile()
         {
             CreateMap<SaveMessageDto, Message>();
-            CreateMap<Message, ReadChatMessageDto>();
+            CreateMap<Message, ReceiveChatMessageDto>();
             CreateMap<Message, ReadGroupMessageDto>();
             CreateMap<RegisterUserDto, User>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => false))

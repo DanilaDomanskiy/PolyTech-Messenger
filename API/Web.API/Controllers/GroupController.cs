@@ -148,6 +148,10 @@ namespace Web.API.Controllerss
                     return Forbid();
                 }
 
+                string profileImagesFolder = Path.Combine(_folderPath, "profile-images");
+
+                Directory.CreateDirectory(profileImagesFolder);
+
                 string? oldFile;
 
                 if (file == null || file.Length == 0)
