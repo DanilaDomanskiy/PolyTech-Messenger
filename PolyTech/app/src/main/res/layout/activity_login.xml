@@ -8,13 +8,135 @@
     android:background="@color/white"
     tools:context=".LoginActivity">
 
+
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="276dp"
-        android:layout_height="282dp"
-        android:layout_marginTop="60dp"
+        android:layout_width="270dp"
+        android:layout_height="270dp"
+        android:layout_marginTop="75dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/bntu" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Регистрация"
+        android:textColor="#2C804C"
+        android:textSize="26dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="260dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="50dp"
+        android:elevation="2in"
+        android:fontFamily="@font/lato"
+        android:hint="Имя"
+        android:inputType="textPersonName"
+        android:textColor="#2C804C"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="260dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="20dp"
+        android:elevation="2in"
+        android:fontFamily="@font/lato"
+        android:hint="Почта"
+        android:inputType="textEmailAddress"
+        android:textColor="#2C804C"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText3" />
+
+    <EditText
+        android:id="@+id/editText5"
+        android:layout_width="260dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="20dp"
+        android:elevation="2in"
+        android:fontFamily="@font/lato"
+        android:hint="Пароль"
+        android:inputType="textPassword"
+        android:textColor="#2C804C"
+        android:textSize="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/appCompatButton"
+        android:layout_width="260dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/green_btn"
+        android:text="Зарегистрироваться"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+
+
+    <TextView
+        android:id="@+id/tooltipName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:text="Имя должно содержать от 2 до 100 символов"
+        android:textColor="#2C804C"
+        android:textSize="10dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText3" />
+
+    <TextView
+        android:id="@+id/tooltipEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:text="Почта должна содержать от 2 до 100 символов и @"
+        android:textColor="#2C804C"
+        android:textSize="10dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+
+    <TextView
+        android:id="@+id/tooltipPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:text="Пароль должен содержать от 6 до 100 символов"
+        android:textColor="#2C804C"
+        android:textSize="10dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText5" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

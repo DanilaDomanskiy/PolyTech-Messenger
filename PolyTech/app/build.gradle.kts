@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    kotlin("kapt")
 }
+
 
 android {
     namespace = "com.example.polytech"
@@ -36,7 +38,8 @@ android {
 }
 
 dependencies {
-
+    kapt("com.github.bumptech.glide:compiler:4.12.0")  // Добавьте эту строку
+    implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
