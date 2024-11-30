@@ -22,12 +22,14 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoadingOlderMessages, setIsLoadingOlderMessages] = useState(false); // Новое состояние
   const navigate = useNavigate();
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
   const connection = useSignalR();
   const messagesEndRef = useRef(null);
+  const scrollRef = useRef(null);
 
   // Обработка ошибок
   const handleError = useCallback(
@@ -41,7 +43,7 @@ const ChatPage = () => {
     [navigate]
   );
 
-  const loadMessages = async (pageNumber) => {
+  const loadMessages = async () => {
     if (loading || !hasMore) return;
     setLoading(true);
 
@@ -51,17 +53,13 @@ const ChatPage = () => {
         {
           params: {
             chatId,
-            pageNumber,
+            page,
             pageSize: 20,
           },
-          withCredentials: true, // Указание на отправку cookies
+          withCredentials: true,
         }
       );
 
-      // Логируем полный ответ, чтобы проверить структуру данных
-      console.log(response.data);
-
-      // Проверка на существование messages и если их нет, используем пустой массив
       const newMessages = Array.isArray(response.data)
         ? response.data
             .slice()
@@ -71,22 +69,19 @@ const ChatPage = () => {
               Content: message.content,
               Timestamp: message.timestamp,
               Sender: message.sender,
+              IsSender: message.isSender,
             }))
         : [];
 
       if (newMessages.length === 0) {
-        console.log("Сообщения не найдены или пришел пустой массив");
-      }
-
-      // Если есть новые сообщения, добавляем их в список
-      setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-
-      // Если новых сообщений меньше 20, значит, больше нет
-      if (newMessages.length < 20) {
         setHasMore(false);
+      } else {
+        setMessages((prevMessages) => [
+          ...newMessages,
+          ...prevMessages, // Новые сообщения добавляем в начало
+        ]);
+        setPage((prevPageNumber) => prevPageNumber + 1);
       }
-
-      setPage(pageNumber + 1);
     } catch (err) {
       console.error("Ошибка при загрузке сообщений:", err);
     } finally {
@@ -94,10 +89,9 @@ const ChatPage = () => {
     }
   };
 
-  // Инициализация соединения при изменении маршрута
   useEffect(() => {
     if (location.pathname === "/login" || location.pathname === "/register") {
-      return; // Пропускаем подключение, если находимся на странице логина или регистрации
+      return;
     }
 
     const initialConnection = async () => {
@@ -106,10 +100,7 @@ const ChatPage = () => {
           await connection.invoke("JoinPrivateChatAsync", chatId);
           setIsConnected(true);
 
-          // Подписка на событие получения сообщения
           connection.on("ReceivePrivateChatMessage", (message) => {
-            console.log("Получено сообщение:", message);
-
             setMessages((prev) => [
               ...prev,
               {
@@ -117,13 +108,18 @@ const ChatPage = () => {
                 Content: message.content,
                 Timestamp: message.timestamp,
                 Sender: message.sender,
+                IsSender: message.isSender,
               },
             ]);
           });
 
-          loadMessages(1);
+          await loadMessages();
+
+          // После первоначальной загрузки прокручиваем вниз
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+          }
         } catch (error) {
-          console.error(error);
           handleError(error);
         }
       }
@@ -141,38 +137,30 @@ const ChatPage = () => {
   }, [connection, chatId, handleError, location.pathname]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && !loading && !isLoadingOlderMessages) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, loading, isLoadingOlderMessages]);
 
-  // Отправка нового сообщения
   const handleSendMessage = async () => {
-    console.log("Проверяем перед отправкой: ", {
-      newMessage,
-      connection,
-      chatId,
-    });
-
     if (newMessage && connection && chatId) {
       try {
+        const sentMessage = {
+          Id: Date.now(), // Пример генерации уникального ID
+          Content: newMessage,
+          Timestamp: new Date().toISOString(),
+          Sender: userName,
+          IsSender: true,
+        };
+
         await connection.invoke("SendPrivateChatMessageAsync", {
           PrivateChatId: chatId,
           Content: newMessage,
-          Timestamp: new Date().toISOString(),
+          Timestamp: sentMessage.Timestamp,
         });
-        console.log("Сообщение отправлено успешно:", newMessage);
-        // Локально добавляем сообщение для немедленного отображения
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            Id: newMessage.Id,
-            Content: newMessage,
-            Timestamp: new Date().toISOString(),
-            Sender: userName,
-          },
-        ]);
-        setNewMessage(""); // Очищаем поле ввода после отправки
+
+        setMessages((prevMessages) => [...prevMessages, sentMessage]);
+        setNewMessage("");
       } catch (error) {
         console.error("Ошибка при отправке сообщения:", error);
       }
@@ -181,18 +169,23 @@ const ChatPage = () => {
     }
   };
 
-  // Обработка нажатия клавиши "Enter"
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
     }
   };
 
-  // Обработчик прокрутки для загрузки дополнительных сообщений
-  const handleScroll = (e) => {
-    const top = e.target.scrollTop === 0; // Если прокрутка достигла верхней части
-    if (top && hasMore && !loading) {
-      loadMessages(page);
+  const handleScroll = async () => {
+    const scrollContainer = scrollRef.current;
+
+    if (scrollContainer.scrollTop === 0 && hasMore && !loading) {
+      const previousScrollHeight = scrollContainer.scrollHeight;
+      setIsLoadingOlderMessages(true); // Устанавливаем флаг загрузки старых сообщений
+      await loadMessages();
+      const newScrollHeight = scrollContainer.scrollHeight;
+      // Сохраняем позицию прокрутки
+      scrollContainer.scrollTop = newScrollHeight - previousScrollHeight;
+      setIsLoadingOlderMessages(false); // Сбрасываем флаг после загрузки
     }
   };
 
@@ -202,19 +195,19 @@ const ChatPage = () => {
         <h3>{userName}</h3>
       </div>
 
-      <div className="chat-messages" onScroll={handleScroll}>
+      <div className="chat-messages" onScroll={handleScroll} ref={scrollRef}>
         {messages.map((message, index) => (
           <div
-            key={index}
+            key={`${message.Id}-${index}`} // Комбинация уникального ID и индекса
             className={`message ${
-              message.Sender === userName ? "my-message" : "other-message"
+              message.IsSender ? "my-message" : "other-message"
             }`}
           >
             <p>{message.Content}</p>
             <span className="timestamp">{formatDate(message.Timestamp)}</span>
           </div>
         ))}
-        {/* Скрытый элемент, к которому прокручиваем */}
+
         <div ref={messagesEndRef} />
       </div>
 
