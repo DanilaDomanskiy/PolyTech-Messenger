@@ -14,7 +14,7 @@ namespace Web.Persistence.Repositories
         {
             return await _context.PrivateChats
                 .AsNoTracking()
-                .Where(pc => pc.Users.Any(user => user.Id == userId))
+                .Where(pc => pc.Users.Any(user => user.Id == userId) && pc.Messages.Any())
                 .Select(pc => new PrivateChat
                 {
                     Id = pc.Id,

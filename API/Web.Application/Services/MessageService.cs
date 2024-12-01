@@ -38,21 +38,19 @@ namespace Web.Application.Services
             {
                 var readMessage = _mapper.Map<ReadGroupMessageDto>(message);
                 readMessage.Content = _encryptionService.Decrypt(readMessage.Content);
-                readMessage.IsSender = readMessage.SenderId == userId;
                 readMessage.SenderName = message.Sender.Name;
                 return readMessage;
             });
         }
 
-        public async Task<IEnumerable<ReadChatMessageDto>?> GetChatMessagesAsync(Guid chatId, Guid userId, int page, int pageSize)
+        public async Task<IEnumerable<ReceiveChatMessageDto>?> GetChatMessagesAsync(Guid chatId, Guid userId, int page, int pageSize)
         {
             var messages = await _messageRepository.ReadChatMessagesAsync(chatId, userId, page, pageSize);
 
             return messages?.Select(message =>
             {
-                var readMessage = _mapper.Map<ReadChatMessageDto>(message);
+                var readMessage = _mapper.Map<ReceiveChatMessageDto>(message);
                 readMessage.Content = _encryptionService.Decrypt(readMessage.Content);
-                readMessage.IsSender = readMessage.SenderId == userId;
                 return readMessage;
             });
         }

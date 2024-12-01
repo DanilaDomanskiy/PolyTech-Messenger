@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Web.Application.Dto_s.Message;
 using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Services.Interfaces.IServices;
 
 namespace Web.API.Controllers
 {
     [Authorize]
-    [Route("api/privateChat")]
+    [Route("api/chat")]
     [ApiController]
     public class PrivateChatController : ControllerBase
     {
@@ -34,7 +33,7 @@ namespace Web.API.Controllers
             return Unauthorized();
         }
 
-        [HttpGet]
+        [HttpGet("{chatId}")]
         public async Task<IActionResult> ReadChat(Guid chatId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
@@ -52,23 +51,18 @@ namespace Web.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateChat([FromBody] Guid otherUserId)
+        public async Task<IActionResult> CreateChat([FromBody] CreateChatDto createPrivateChatDto)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
-                var privateChat = new PrivateChatUsersDto
-                {
-                    User1Id = currentUserId,
-                    User2Id = otherUserId
-                };
-                var chatId = await _privateChatService.CreateChatAsync(privateChat);
+                var chatId = await _privateChatService.CreateChatAsync(currentUserId, createPrivateChatDto);
                 return Ok(chatId);
             }
             return Unauthorized();
         }
 
-        [HttpDelete("empty")]
+        [HttpDelete("empty/{chatId}")]
         public async Task<IActionResult> DeleteChatIfEmpty(Guid chatId)
         {
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;

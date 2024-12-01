@@ -181,16 +181,11 @@ namespace Web.Persistence.Repositories
 
         public async Task<IEnumerable<User>?> ReadGroupUsersAsync(Guid groupId)
         {
-            var group = await _context.Groups.FindAsync(groupId);
+            var group = await _context.Groups
+                .AsNoTracking()
+                .Include(g => g.Users)
+                .FirstOrDefaultAsync(g => g.Id == groupId);
             return group?.Users;
-        }
-
-        public async Task UpdateNameAsync(Guid groupId, string name)
-        {
-            var group = await _context.Groups.FindAsync(groupId);
-            if (group == null) return;
-            group.Name = name;
-            await _context.SaveChangesAsync();
         }
     }
 }

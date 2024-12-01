@@ -11,7 +11,6 @@ using Web.Application.Dto_s.User;
 using Web.Application.Services;
 using Web.Application.Services.Interfaces;
 using Web.Application.Services.Interfaces.IServices;
-using Web.Application.Validators.Group;
 using Web.Application.Validators.User;
 using Web.Core.IRepositories;
 using Web.Infrastructure;
@@ -54,7 +53,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policyBuilder =>
     {
         policyBuilder
-            .WithOrigins("http://localhost:3000", "https://localhost:7205")
+            .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -90,8 +89,7 @@ builder.Services.AddScoped<IUnreadMessagesRepository, UnreadMessagesRepository>(
 builder.Services.AddScoped<IUnreadMessagesService, UnreadMessagesService>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
-builder.Services.AddScoped<IValidator<GroupNameDto>, GroupNameDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdatePasswordDto>, UpdatePasswordDtoValidator>();
+builder.Services.AddScoped<IValidator<UserPasswordDto>, UpdatePasswordDtoValidator>();
 
 builder.Services.AddDbContext<WebContext>();
 builder.Services.AddSignalR();

@@ -54,9 +54,9 @@ namespace Web.Application.Services
             });
         }
 
-        public async Task<Guid?> CreateChatAsync(PrivateChatUsersDto model)
+        public async Task<Guid?> CreateChatAsync(Guid currentUserId, CreateChatDto model)
         {
-            var chatId = await _privateChatRepository.ReadChatIdIfChatExistsAsync(model.User1Id, model.User2Id);
+            var chatId = await _privateChatRepository.ReadChatIdIfChatExistsAsync(currentUserId, model.OtherUserId);
             if (chatId.HasValue)
             {
                 return chatId.Value;
@@ -66,8 +66,8 @@ namespace Web.Application.Services
             {
                 Users = new List<User>
                 {
-                    await _userRepository.ReadAsync(model.User1Id),
-                    await _userRepository.ReadAsync(model.User2Id)
+                    await _userRepository.ReadAsync(currentUserId),
+                    await _userRepository.ReadAsync(model.OtherUserId)
                 },
                 Messages = new List<Message>()
             };

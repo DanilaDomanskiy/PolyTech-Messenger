@@ -11,7 +11,5 @@ namespace Web.Core.IRepositories
         Task<IEnumerable<User>?> ReadByEmailLettersAsync(string email, Guid Id);
 
         Task<IEnumerable<User>?> ReadNoGroupUsersAsync(string email, Guid groupId);
-        Task UpdateNameAsync(Guid userId, string name);
-        Task UpdatePasswordAsync(Guid currentUserId, string passwordHash);
     }
 }
