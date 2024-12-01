@@ -13,7 +13,7 @@ const ChatMessages = () => {
     const fetchChats = async () => {
       try {
         const response = await axios.get(
-          "https://localhost:7205/api/privateChat/all",
+          "https://localhost:7205/api/chat/all",
           {
             withCredentials: true,
           }

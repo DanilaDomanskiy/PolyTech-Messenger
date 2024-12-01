@@ -22,26 +22,37 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [userId, setUserId] = useState(null);
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
   const connection = useSignalR();
   const messagesEndRef = useRef(null);
   const scrollRef = useRef(null);
-  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false); // Новое состояние
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
 
-  // Функция для загрузки сообщений
+  // Функция для получения userId
+  const fetchUserId = async () => {
+    try {
+      const response = await axios.get("https://localhost:7205/api/user/id", {
+        withCredentials: true,
+      });
+      setUserId(response.data); // Предполагаем, что API возвращает userId в response.data
+    } catch (error) {
+      console.error("Ошибка при получении userId:", error);
+    }
+  };
+
+  // Загрузка сообщений
   const loadMessages = async () => {
-    if (loading || !hasMore) return;
+    if (loading || !hasMore || !userId) return; // Проверяем userId
 
     setLoading(true);
-
     try {
       const response = await axios.get(
-        "https://localhost:7205/api/message/byChatId",
+        `https://localhost:7205/api/message/chat/${chatId}`,
         {
           params: {
-            chatId,
             page,
             pageSize: 20,
           },
@@ -57,18 +68,17 @@ const ChatPage = () => {
               Id: message.Id,
               Content: message.content,
               Timestamp: message.timestamp,
-              Sender: message.sender,
-              IsSender: message.isSender,
+              Sender: message.senderId,
+              IsSender: message.senderId === userId,
             }))
         : [];
 
       if (newMessages.length === 0) {
-        setHasMore(false); // Нет больше сообщений для загрузки
+        setHasMore(false);
       } else {
         setMessages((prevMessages) => [...newMessages, ...prevMessages]);
         setPage((prevPageNumber) => prevPageNumber + 1);
 
-        // Отмечаем завершение первой загрузки
         if (!isInitialLoadDone) {
           setIsInitialLoadDone(true);
         }
@@ -80,9 +90,10 @@ const ChatPage = () => {
     }
   };
 
+  // Инициализация соединения SignalR
   useEffect(() => {
     const initialConnection = async () => {
-      if (connection && chatId) {
+      if (connection && chatId && userId) {
         try {
           await connection.invoke("JoinPrivateChatAsync", chatId);
           setIsConnected(true);
@@ -94,12 +105,11 @@ const ChatPage = () => {
                 Id: message.Id,
                 Content: message.content,
                 Timestamp: message.timestamp,
-                Sender: message.sender,
-                IsSender: message.isSender,
+                Sender: message.senderId,
+                IsSender: message.senderId === userId,
               },
             ]);
 
-            // Прокрутка вниз после получения нового сообщения
             setTimeout(() => {
               if (messagesEndRef.current) {
                 messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -109,7 +119,6 @@ const ChatPage = () => {
 
           await loadMessages();
 
-          // Прокручиваем вниз после завершения загрузки начальных сообщений
           setTimeout(() => {
             if (messagesEndRef.current) {
               messagesEndRef.current.scrollIntoView({ behavior: "auto" });
@@ -121,7 +130,9 @@ const ChatPage = () => {
       }
     };
 
-    initialConnection();
+    if (userId) {
+      initialConnection();
+    }
 
     return () => {
       if (connection && chatId) {
@@ -130,8 +141,9 @@ const ChatPage = () => {
         setIsConnected(false);
       }
     };
-  }, [connection, chatId]);
+  }, [connection, chatId, userId]); // Теперь добавляется зависимость от userId
 
+  // Отправка нового сообщения
   const handleSendMessage = async () => {
     if (!newMessage || !isConnected) return;
 
@@ -153,34 +165,32 @@ const ChatPage = () => {
       setMessages((prevMessages) => [...prevMessages, sentMessage]);
       setNewMessage("");
 
-      // Прокручиваем чат до самого низа после обновления DOM
       setTimeout(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
-      }, 0); // Добавляем небольшую задержку
+      }, 0);
     } catch (err) {
       console.error("Ошибка при отправке сообщения:", err);
     }
   };
 
+  // Обработчик нажатия Enter
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSendMessage();
     }
   };
 
+  // Прокрутка в верх при загрузке старых сообщений
   const handleScroll = async () => {
     const scrollContainer = scrollRef.current;
 
-    // Проверяем, что мы находимся вверху чата (чтобы подгрузить старые сообщения)
     if (scrollContainer.scrollTop === 0 && hasMore && !loading) {
       const chatMessagesElement = document.querySelector(".chat-messages");
       const previousScrollHeight = chatMessagesElement.scrollHeight;
 
-      setLoading(true); // Включаем состояние загрузки
-
-      // Загружаем более старые сообщения
+      setLoading(true);
       await loadMessages();
 
       setTimeout(() => {
@@ -196,11 +206,8 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
-    // Прокручиваем вниз до самого низа после загрузки новых сообщений
-    if (!isInitialLoadDone && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
-    }
-  }, [messages]); // Срабатывает при изменении сообщений
+    fetchUserId(); // Получаем userId при монтировании
+  }, []); // Вызывается один раз при монтировании
 
   return (
     <div className="chat-page">
