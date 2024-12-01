@@ -99,3 +99,8 @@
   text-align: right;
   display: block;
 }
+
+.status {
+  font-size: 15px;
+  color: rgb(189, 189, 189);
+}

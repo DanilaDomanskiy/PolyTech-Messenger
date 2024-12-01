@@ -154,7 +154,7 @@ body {
 /* Название чата */
 #privateMessages li span,
 #groupMessages li span {
-  font-size: 16px;
+  font-size: 20px;
   color: #333;
 }
 

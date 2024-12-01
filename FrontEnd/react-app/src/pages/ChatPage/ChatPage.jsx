@@ -23,6 +23,7 @@ const ChatPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [userStatus, setUserStatus] = useState("Не в сети"); // Состояние для статуса
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
@@ -213,6 +214,7 @@ const ChatPage = () => {
     <div className="chat-page">
       <div className="chat-header">
         <h3>{userName}</h3>
+        <span className="status">{userStatus}</span>
       </div>
 
       <div className="chat-messages" onScroll={handleScroll} ref={scrollRef}>
