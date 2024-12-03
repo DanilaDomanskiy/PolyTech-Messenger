@@ -9,10 +9,11 @@ body {
   font-family: "Roboto", Arial, sans-serif;
   background: linear-gradient(135deg, #d4eac7, #2c804c);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  height: 100vh;
+  justify-content: center; /* Центрируем по горизонтали */
+  align-items: center; /* Центрируем по вертикали */
+  height: 100vh; /* Высота равна высоте экрана */
   margin: 0;
+  overflow: hidden; /* Убираем прокрутку */
 }
 
 .container {
@@ -20,32 +21,40 @@ body {
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 700px;
-  padding: 20px;
+  max-width: 100%; /* Ограничиваем максимальную ширину */
+  padding: 0px;
+  padding-bottom: 20px;
   text-align: center;
   margin: 10px 0;
-  min-height: calc(100vh - 10px);
+  height: 90vh; /* Задаем контейнеру высоту 90vh */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden; /* Убираем прокрутку внутри контейнера */
 }
 
 /* Стили для контейнера поиска */
 .search-container {
   position: relative;
   width: 100%;
-  margin-bottom: 60px; /* Добавляем отступ снизу */
+  margin-bottom: 10px; /* Добавим отступ снизу */
+  background-color: #2c804c; /* Зеленая шапка */
+  padding: 20px 0; /* Отступы сверху и снизу */
+  border-radius: 10px 10px 0px 0px; /* Закруглим углы */
 }
 
 /* Стили для поля поиска */
 .search-input {
-  width: 80%;
+  width: 90%;
   padding: 8px 35px 8px 40px;
-  margin: 0 auto; /* Центрируем элемент */
+  margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 15px;
   font-size: 14px;
   outline: none;
   transition: border-color 0.3s;
+  background-color: #fff; /* Белый фон для поля */
+  z-index: 1; /* Убедимся, что поле поиска будет на переднем плане */
 }
 
 .search-input:focus {
@@ -56,7 +65,7 @@ body {
 /* Стили для значка поиска */
 .search-icon {
   position: absolute;
-  left: 75px;
+  left: 50px;
   top: 50%;
   transform: translateY(-50%);
   width: 20px;
@@ -99,12 +108,13 @@ body {
 #content {
   text-align: left;
   flex-grow: 1;
+  overflow-y: auto; /* Добавляем прокрутку только для контента */
 }
 
 .title {
-  font-size: 24px; /* Увеличен размер заголовка */
+  font-size: 24px;
   color: #2c804c;
-  margin-bottom: 10px; /* Увеличен отступ после заголовка */
+  margin-bottom: 10px;
   text-align: center;
 }
 
@@ -114,21 +124,12 @@ body {
   color: #333;
 }
 
-/* Заголовок чатов */
-#privateMessages .title,
-#groupMessages .title {
-  font-size: 30px;
-  font-weight: bold;
-  color: #2c804c;
-  margin-bottom: 15px;
-}
-
 /* Стили для списка чатов */
 #privateMessages ul,
 #groupMessages ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 10px;
 }
 
 /* Элемент списка чатов */
@@ -136,7 +137,7 @@ body {
 #groupMessages li {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 5px;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 6px;

@@ -3,13 +3,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import "../../pages/SelectChat/SelectChat.css";
+import { useHandleError } from "../../Scripts";
+import Error from "../../components/Error";
 
 const ChatMessages = () => {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const connection = useSignalR();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState(false);
+  const handleError = useHandleError();
 
   useEffect(() => {
     const connectSignalR = async () => {
@@ -31,8 +34,8 @@ const ChatMessages = () => {
               );
             }
           );
-        } catch (err) {
-          console.error("Ошибка подключения:", err);
+        } catch (error) {
+          handleError(error, setErrorMessage);
         }
       }
     };
@@ -45,7 +48,7 @@ const ChatMessages = () => {
         connection.off("ReceivePrivateChatMessages");
       }
     };
-  }, [connection]);
+  }, [connection, handleError]);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -56,17 +59,13 @@ const ChatMessages = () => {
             withCredentials: true,
           }
         );
-
-        console.log("Полученные чаты с сервера:", response.data); // Логирование
         setChats(response.data);
-      } catch (error) {
-        setError(error.response ? error.response.data.message : error.message);
-      } finally {
         setLoading(false);
+      } catch (error) {
+        handleError(error, setErrorMessage);
       }
     };
-
-    fetchChats(); // Вызов функции получения чатов
+    fetchChats();
   }, []);
 
   const handleChatClick = (chatId, userName) => {
@@ -79,19 +78,14 @@ const ChatMessages = () => {
     navigate("/chat", { state: { chatId, userName } });
   };
 
-  // Отображение во время загрузки
   if (loading) {
     return <p>Загрузка чатов...</p>;
   }
 
-  // Обработка ошибок
-  if (error) {
-    return <p>Ошибка: {error}</p>;
-  }
+  if (errorMessage) return <Error />;
 
   return (
     <div id="privateMessages">
-      <h2 className="title">Чаты</h2>
       {chats.length > 0 ? (
         <ul>
           {chats.map((chat) => (

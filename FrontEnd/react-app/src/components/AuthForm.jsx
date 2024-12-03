@@ -27,7 +27,7 @@ const AuthForm = () => {
       );
 
       if (response.status >= 200 && response.status <= 299) {
-        navigate("/selectChat");
+        navigate("/");
       } else {
         console.log(response.status);
       }

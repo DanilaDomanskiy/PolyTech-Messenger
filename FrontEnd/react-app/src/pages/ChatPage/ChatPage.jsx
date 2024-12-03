@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import "../ChatPage/ChatPage.css";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
+import { useHandleError } from "../../Scripts";
+import Error from "../../components/Error";
 
 const formatDate = (date) => {
   const options = {
@@ -31,6 +33,8 @@ const ChatPage = () => {
   const messagesEndRef = useRef(null);
   const scrollRef = useRef(null);
   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
+  const handleError = useHandleError();
 
   // Функция для получения userId
   const fetchUserId = async () => {
@@ -38,9 +42,9 @@ const ChatPage = () => {
       const response = await axios.get("https://localhost:7205/api/user/id", {
         withCredentials: true,
       });
-      setUserId(response.data); // Предполагаем, что API возвращает userId в response.data
+      setUserId(response.data);
     } catch (error) {
-      console.error("Ошибка при получении userId:", error);
+      handleError(error, setErrorMessage);
     }
   };
 
@@ -84,8 +88,8 @@ const ChatPage = () => {
           setIsInitialLoadDone(true);
         }
       }
-    } catch (err) {
-      console.error("Ошибка при загрузке сообщений:", err);
+    } catch (error) {
+      handleError(error, setErrorMessage);
     } finally {
       setLoading(false);
     }
@@ -96,6 +100,7 @@ const ChatPage = () => {
     const initialConnection = async () => {
       if (connection && chatId && userId) {
         try {
+          //Вот здесь оно херится////////////////////////////////////////////////////////////
           await connection.invoke("JoinPrivateChatAsync", chatId);
           setIsConnected(true);
 
@@ -125,8 +130,8 @@ const ChatPage = () => {
               messagesEndRef.current.scrollIntoView({ behavior: "auto" });
             }
           }, 0);
-        } catch (err) {
-          console.error("Ошибка подключения:", err);
+        } catch (error) {
+          handleError(error, setErrorMessage);
         }
       }
     };
@@ -171,8 +176,8 @@ const ChatPage = () => {
           messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
       }, 0);
-    } catch (err) {
-      console.error("Ошибка при отправке сообщения:", err);
+    } catch (error) {
+      handleError(error, setErrorMessage);
     }
   };
 
@@ -209,6 +214,8 @@ const ChatPage = () => {
   useEffect(() => {
     fetchUserId(); // Получаем userId при монтировании
   }, []); // Вызывается один раз при монтировании
+
+  if (errorMessage) return <Error />;
 
   return (
     <div className="chat-page">

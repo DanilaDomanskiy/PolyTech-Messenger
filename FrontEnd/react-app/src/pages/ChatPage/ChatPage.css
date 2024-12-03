@@ -32,24 +32,28 @@
 }
 
 .message {
-  margin-bottom: 10px;
+  margin-bottom: 0px;
   padding: 12px 18px;
   border-radius: 18px 18px 0 18px;
   max-width: 70%; /* Ограничиваем ширину сообщений */
   word-wrap: break-word;
-  line-height: 1.6;
-  font-size: 16px; /* Увеличенный шрифт */
+  font-size: 14px; /* Увеличенный шрифт */
+}
+
+.message p {
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .my-message {
-  background-color: #2c804c;
-  color: white;
+  background-color: #cef9ad;
+  color: black;
   align-self: flex-end;
   border-radius: 18px 18px 18px 0; /* Угол для пользовательских сообщений */
 }
 
 .other-message {
-  background-color: #f0f0f0;
+  background-color: #ffffff;
   align-self: flex-start;
   border-radius: 18px 18px 0 18px; /* Угол для сообщений другого пользователя */
 }
