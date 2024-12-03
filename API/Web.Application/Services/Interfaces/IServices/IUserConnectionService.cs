@@ -9,5 +9,7 @@
         Task<IEnumerable<string>?> GetConnectionsByChatIdAsync(Guid chatId);
         Task<IEnumerable<string>?> GetConnectionsByGroupIdAsync(Guid groupId);
         Task RemoveConnectionAsync(string connectionId);
+        Task SetActiveGroupAsync(string connectionId, Guid? groupId);
+        Task SetActivePrivateChatAsync(string connectionId, Guid? privateChatId);
     }
 }

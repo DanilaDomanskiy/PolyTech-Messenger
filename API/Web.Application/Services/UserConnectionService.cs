@@ -42,5 +42,15 @@ namespace Web.Application.Services
         {
             return await _userConnectionRepository.ReadAllConnectionsAsync(userId);
         }
+
+        public async Task SetActivePrivateChatAsync(string connectionId, Guid? privateChatId)
+        {
+            await _userConnectionRepository.SetActivePrivateChatAsync(connectionId, privateChatId);
+        }
+
+        public async Task SetActiveGroupAsync(string connectionId, Guid? groupId)
+        {
+            await _userConnectionRepository.SetActiveGroupAsync(connectionId, groupId);
+        }
     }
 }

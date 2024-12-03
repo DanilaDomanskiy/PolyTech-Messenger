@@ -92,21 +92,23 @@ namespace Web.Persistence.Repositories
 
         public async Task UpdateUnreadMessagesAsync(Guid groupId, Guid userId)
         {
-            var otherUsersIds = await _context.Users
-                .Where(user => user.Groups.Any(g => g.Id == groupId) && user.Id != userId)
-                .Select(user => user.Id)
-                .ToListAsync();
+            var inactiveUserIds = await _context.Users
+                .Where(
+                user => user.Groups.Any(g => g.Id == groupId) &&
+                user.Id != userId &&
+                !user.Connections.Any(uc => uc.ActiveGroupId == groupId))
+                .Select(user => user.Id).ToListAsync();
 
-            if (otherUsersIds.Count == 0) return;
+            if (inactiveUserIds.Count == 0) return;
 
             var existingUnreadMessages = await _context.UnreadMessages
-                .Where(um => um.GroupId == groupId && otherUsersIds.Contains(um.UserId))
-                .ToDictionaryAsync(um => um.UserId);
+                .Where(um => um.GroupId == groupId && inactiveUserIds.Contains(um.UserId))
+                .ToDictionaryAsync(um => um.UserId, um => um);
 
             var newUnreadMessages = new List<UnreadMessages>();
-            foreach (var otherUserId in otherUsersIds)
+            foreach (var userIdToUpdate in inactiveUserIds)
             {
-                if (existingUnreadMessages.TryGetValue(otherUserId, out var unreadMessage))
+                if (existingUnreadMessages.TryGetValue(userIdToUpdate, out var unreadMessage))
                 {
                     unreadMessage.Count++;
                 }
@@ -114,14 +116,14 @@ namespace Web.Persistence.Repositories
                 {
                     newUnreadMessages.Add(new UnreadMessages
                     {
-                        UserId = otherUserId,
+                        UserId = userIdToUpdate,
                         GroupId = groupId,
                         Count = 1
                     });
                 }
             }
 
-            if (newUnreadMessages.Count > 0)
+            if (newUnreadMessages.Count != 0)
             {
                 await _context.UnreadMessages.AddRangeAsync(newUnreadMessages);
             }

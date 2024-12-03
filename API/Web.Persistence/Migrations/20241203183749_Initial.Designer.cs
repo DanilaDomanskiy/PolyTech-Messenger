@@ -12,8 +12,8 @@ using Web.Persistence;
 namespace Web.Persistence.Migrations
 {
     [DbContext(typeof(WebContext))]
-    [Migration("20241118232948_INITIAL")]
-    partial class INITIAL
+    [Migration("20241203183749_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,7 +61,7 @@ namespace Web.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CreatorId")
+                    b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImagePath")
@@ -97,7 +97,7 @@ namespace Web.Persistence.Migrations
                     b.Property<Guid?>("PrivateChatId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SenderId")
+                    b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Timestamp")
@@ -142,7 +142,7 @@ namespace Web.Persistence.Migrations
                     b.Property<Guid?>("PrivateChatId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -200,6 +200,12 @@ namespace Web.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ActiveGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ActivePrivateChatId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ConnectionId")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -209,6 +215,10 @@ namespace Web.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActiveGroupId");
+
+                    b.HasIndex("ActivePrivateChatId");
 
                     b.HasIndex("ConnectionId");
 
@@ -252,7 +262,8 @@ namespace Web.Persistence.Migrations
                     b.HasOne("Web.Core.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.Navigation("Creator");
                 });
@@ -272,7 +283,8 @@ namespace Web.Persistence.Migrations
                     b.HasOne("Web.Core.Entities.User", "Sender")
                         .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -296,7 +308,8 @@ namespace Web.Persistence.Migrations
                     b.HasOne("Web.Core.Entities.User", "User")
                         .WithMany("UnreadMessages")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Group");
 
@@ -307,17 +320,33 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("Web.Core.Entities.UserConnection", b =>
                 {
+                    b.HasOne("Web.Core.Entities.Group", "ActiveGroup")
+                        .WithMany("ActiveUserConnections")
+                        .HasForeignKey("ActiveGroupId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Web.Core.Entities.PrivateChat", "ActivePrivateChat")
+                        .WithMany("ActiveUserConnections")
+                        .HasForeignKey("ActivePrivateChatId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Web.Core.Entities.User", "User")
                         .WithMany("Connections")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ActiveGroup");
+
+                    b.Navigation("ActivePrivateChat");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Web.Core.Entities.Group", b =>
                 {
+                    b.Navigation("ActiveUserConnections");
+
                     b.Navigation("Messages");
 
                     b.Navigation("UnreadMessages");
@@ -325,6 +354,8 @@ namespace Web.Persistence.Migrations
 
             modelBuilder.Entity("Web.Core.Entities.PrivateChat", b =>
                 {
+                    b.Navigation("ActiveUserConnections");
+
                     b.Navigation("Messages");
 
                     b.Navigation("UnreadMessages");

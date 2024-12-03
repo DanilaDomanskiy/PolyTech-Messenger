@@ -14,13 +14,23 @@ namespace Web.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
-            builder.HasIndex(uc => uc.ConnectionId);
-            builder.HasIndex(uc => uc.UserId);
-
             builder.HasOne(uc => uc.User)
                .WithMany(u => u.Connections)
                .HasForeignKey(uc => uc.UserId)
                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(uc => uc.ActivePrivateChat)
+               .WithMany(pc => pc.ActiveUserConnections)
+               .HasForeignKey(uc => uc.ActivePrivateChatId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(uc => uc.ActiveGroup)
+               .WithMany(g => g.ActiveUserConnections)
+               .HasForeignKey(uc => uc.ActiveGroupId)
+               .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasIndex(uc => uc.ConnectionId);
+            builder.HasIndex(uc => uc.UserId);
         }
     }
 }

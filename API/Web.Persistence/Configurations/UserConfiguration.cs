@@ -17,9 +17,6 @@ namespace Web.Persistence.Configurations
             builder.Property(u => u.Email)
                 .IsRequired();
 
-            builder.HasIndex(u => u.Email)
-                .IsUnique();
-
             builder.Property(u => u.PasswordHash)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -33,6 +30,8 @@ namespace Web.Persistence.Configurations
             builder.Property(u => u.ProfileImagePath)
                 .IsRequired(false)
                 .HasMaxLength(100);
+
+            builder.HasIndex(u => u.Email).IsUnique();
         }
     }
 }
