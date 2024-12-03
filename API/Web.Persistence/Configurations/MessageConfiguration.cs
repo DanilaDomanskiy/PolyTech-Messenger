@@ -17,8 +17,6 @@ namespace Web.Persistence.Configurations
             builder.Property(m => m.Timestamp)
                 .IsRequired();
 
-            builder.HasIndex(m => m.Timestamp);
-
             builder.HasOne(m => m.Sender)
                 .WithMany(u => u.SentMessages)
                 .HasForeignKey(m => m.SenderId)
@@ -29,14 +27,14 @@ namespace Web.Persistence.Configurations
                 .HasForeignKey(m => m.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(m => m.GroupId);
-
             builder.HasOne(m => m.PrivateChat)
                 .WithMany(pc => pc.Messages)
                 .HasForeignKey(m => m.PrivateChatId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(m => m.PrivateChatId);
+            builder.HasIndex(m => m.GroupId);
+            builder.HasIndex(m => m.Timestamp);
         }
     }
 }

@@ -9,6 +9,11 @@ namespace Web.Core.IRepositories
         Task DeleteConnectionAsync(string connectionId);
 
         Task<IEnumerable<string>?> ReadAllConnectionsAsync(Guid userId);
+
         Task<IEnumerable<string>?> ReadConnectionsByGroupIdAsync(Guid groupId);
+
+        Task SetActiveGroupAsync(string connectionId, Guid? groupId);
+
+        Task SetActivePrivateChatAsync(string connectionId, Guid? privateChatId);
     }
 }

@@ -10,7 +10,6 @@ namespace Web.API
         private readonly IMessageService _messageService;
         private readonly IUserConnectionService _userConnectionService;
         private readonly IPrivateChatService _privateChatService;
-        private readonly IUnreadMessagesService _unreadMessagesService;
         private readonly IUserService _userService;
         private readonly IGroupService _groupService;
 
@@ -19,7 +18,6 @@ namespace Web.API
             IHttpContextAccessor httpContextAccessor,
             IUserConnectionService userConnectionService,
             IPrivateChatService privateChatService,
-            IUnreadMessagesService unreadMessagesService,
             IUserService userService,
             IGroupService groupService)
         {
@@ -27,7 +25,6 @@ namespace Web.API
             _httpContextAccessor = httpContextAccessor;
             _userConnectionService = userConnectionService;
             _privateChatService = privateChatService;
-            _unreadMessagesService = unreadMessagesService;
             _userService = userService;
             _groupService = groupService;
         }
@@ -35,6 +32,7 @@ namespace Web.API
         public async Task JoinPrivateChatAsync(Guid privateChatId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
+            await _userConnectionService.SetActivePrivateChatAsync(Context.ConnectionId, privateChatId);
         }
 
         public async Task LeavePrivateChatAsync(Guid privateChatId)
@@ -44,7 +42,7 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
-                await _unreadMessagesService.СlearPrivateChatUnreadMessagesAsync(userId, privateChatId);
+                await _userConnectionService.SetActivePrivateChatAsync(Context.ConnectionId, null);
             }
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
@@ -53,6 +51,7 @@ namespace Web.API
         public async Task JoinGroupAsync(Guid groupId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
+            await _userConnectionService.SetActiveGroupAsync(Context.ConnectionId, groupId);
         }
 
         public async Task LeaveGroupAsync(Guid groupId)
@@ -62,7 +61,7 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
-                await _unreadMessagesService.СlearGroupUnreadMessagesAsync(userId, groupId);
+                await _userConnectionService.SetActiveGroupAsync(Context.ConnectionId, null);
             }
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "g" + groupId.ToString());

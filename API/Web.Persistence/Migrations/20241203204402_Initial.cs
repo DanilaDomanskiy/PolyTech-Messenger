@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Web.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class INITIAL : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -84,25 +84,6 @@ namespace Web.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserConnections",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ConnectionId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserConnections", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserConnections_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "GroupUser",
                 columns: table => new
                 {
@@ -133,7 +114,7 @@ namespace Web.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PrivateChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
@@ -165,7 +146,7 @@ namespace Web.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PrivateChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Count = table.Column<int>(type: "int", nullable: false)
@@ -187,6 +168,39 @@ namespace Web.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UnreadMessages_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserConnections",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ConnectionId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ActivePrivateChatId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ActiveGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserConnections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserConnections_Groups_ActiveGroupId",
+                        column: x => x.ActiveGroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_UserConnections_PrivateChats_ActivePrivateChatId",
+                        column: x => x.ActivePrivateChatId,
+                        principalTable: "PrivateChats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_UserConnections_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -242,6 +256,16 @@ namespace Web.Persistence.Migrations
                 name: "IX_UnreadMessages_UserId",
                 table: "UnreadMessages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserConnections_ActiveGroupId",
+                table: "UserConnections",
+                column: "ActiveGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserConnections_ActivePrivateChatId",
+                table: "UserConnections",
+                column: "ActivePrivateChatId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserConnections_ConnectionId",

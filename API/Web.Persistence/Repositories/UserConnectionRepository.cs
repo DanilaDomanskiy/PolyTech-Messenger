@@ -22,7 +22,10 @@ namespace Web.Persistence.Repositories
         public async Task<IEnumerable<string>?> ReadConnectionsByChatIdAsync(Guid chatId)
         {
             return await _context.UserConnections
-                .Where(uc => uc.User.IsActive && uc.User.PrivateChats.Any(pc => pc.Id == chatId))
+                .Where(
+                uc => uc.User.IsActive &&
+                uc.User.PrivateChats.Any(pc => pc.Id == chatId) &&
+                uc.ActivePrivateChatId != chatId)
                 .Select(uc => uc.ConnectionId)
                 .ToListAsync();
         }
@@ -68,9 +71,36 @@ namespace Web.Persistence.Repositories
         public async Task<IEnumerable<string>?> ReadConnectionsByGroupIdAsync(Guid groupId)
         {
             return await _context.UserConnections
-                .Where(uc => uc.User.IsActive && uc.User.Groups.Any(g => g.Id == groupId))
+                .Where(
+                uc => uc.User.IsActive &&
+                uc.User.Groups.Any(g => g.Id == groupId) &&
+                uc.ActiveGroupId != groupId)
                 .Select(uc => uc.ConnectionId)
                 .ToListAsync();
+        }
+
+        public async Task SetActivePrivateChatAsync(string connectionId, Guid? privateChatId)
+        {
+            var connection = await _context.UserConnections
+                .FirstOrDefaultAsync(uc => uc.ConnectionId == connectionId);
+
+            if (connection != null)
+            {
+                connection.ActivePrivateChatId = privateChatId;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task SetActiveGroupAsync(string connectionId, Guid? groupId)
+        {
+            var connection = await _context.UserConnections
+                .FirstOrDefaultAsync(uc => uc.ConnectionId == connectionId);
+
+            if (connection != null)
+            {
+                connection.ActiveGroupId = groupId;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

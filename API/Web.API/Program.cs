@@ -2,11 +2,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using StackExchange.Redis;
 using System.Text;
 using Web.API;
 using Web.Application;
-using Web.Application.Dto_s.Group;
 using Web.Application.Dto_s.User;
 using Web.Application.Services;
 using Web.Application.Services.Interfaces;
@@ -60,18 +58,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("RedisConnectionString");
-    var configurationOptions = new ConfigurationOptions
-    {
-        EndPoints = { connectionString },
-        AbortOnConnectFail = false
-    };
-    return ConnectionMultiplexer.Connect(configurationOptions);
-});
-
-builder.Services.AddSingleton<ICasheProvider, CasheProvider>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
@@ -85,8 +71,6 @@ builder.Services.AddScoped<IGroupRepository, GroupRepository>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IUserConnectionRepository, UserConnectionRepository>();
 builder.Services.AddScoped<IUserConnectionService, UserConnectionService>();
-builder.Services.AddScoped<IUnreadMessagesRepository, UnreadMessagesRepository>();
-builder.Services.AddScoped<IUnreadMessagesService, UnreadMessagesService>();
 builder.Services.AddScoped<IValidator<AuthUserDto>, AuthUserDtoValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<UserPasswordDto>, UpdatePasswordDtoValidator>();

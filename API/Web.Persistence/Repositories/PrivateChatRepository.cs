@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Runtime.ConstrainedExecution;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -75,22 +76,25 @@ namespace Web.Persistence.Repositories
 
         public async Task UpdateUnreadMessagesAsync(Guid privateChatId, Guid currentUserId)
         {
-            var otherUserId = await _context.Users
+            var result = await _context.Users
                 .Where(user => user.PrivateChats.Any(pc => pc.Id == privateChatId) && user.Id != currentUserId)
-                .Select(user => user.Id)
+                .Select(user => new
+                {
+                    UserId = user.Id,
+                    IsActiveInChat = user.Connections.Any(uc => uc.ActivePrivateChatId == privateChatId)
+                })
                 .FirstOrDefaultAsync();
 
-            if (otherUserId == Guid.Empty)
-                return;
+            if (result == null || result.IsActiveInChat) return;
 
             var unreadMessage = await _context.UnreadMessages
-                .FirstOrDefaultAsync(um => um.UserId == otherUserId && um.PrivateChatId == privateChatId);
+                .FirstOrDefaultAsync(um => um.UserId == result.UserId && um.PrivateChatId == privateChatId);
 
             if (unreadMessage == null)
             {
-                await _context.UnreadMessages.AddAsync(new UnreadMessages
+                _context.UnreadMessages.Add(new UnreadMessages
                 {
-                    UserId = otherUserId,
+                    UserId = result.UserId,
                     PrivateChatId = privateChatId,
                     Count = 1
                 });
@@ -98,7 +102,6 @@ namespace Web.Persistence.Repositories
             else
             {
                 unreadMessage.Count++;
-                _context.UnreadMessages.Update(unreadMessage);
             }
 
             await _context.SaveChangesAsync();
