@@ -12,7 +12,7 @@ using Web.Persistence;
 namespace Web.Persistence.Migrations
 {
     [DbContext(typeof(WebContext))]
-    [Migration("20241203183749_Initial")]
+    [Migration("20241203204402_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Web.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -61,7 +61,7 @@ namespace Web.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreatorId")
+                    b.Property<Guid?>("CreatorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImagePath")
@@ -262,8 +262,7 @@ namespace Web.Persistence.Migrations
                     b.HasOne("Web.Core.Entities.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Creator");
                 });

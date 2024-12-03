@@ -46,7 +46,7 @@ namespace Web.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     ImagePath = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
