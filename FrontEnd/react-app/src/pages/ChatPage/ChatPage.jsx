@@ -3,18 +3,23 @@ import { useLocation } from "react-router-dom";
 import "../ChatPage/ChatPage.css";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
-import { useHandleError } from "../../Scripts";
-import Error from "../../components/Error";
+import { DateTime } from "luxon";
 
-const formatDate = (date) => {
-  const options = {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  };
-  return new Date(date).toLocaleString(undefined, options);
+const formatDate = (dateString) => {
+  const date = DateTime.fromISO(dateString, { zone: "utc" }).setZone(
+    "Europe/Minsk"
+  );
+  const now = DateTime.now().setZone("Europe/Minsk");
+
+  const isToday = date.hasSame(now, "day");
+
+  if (isToday) {
+    // Если сообщение отправлено сегодня, показываем только время в Минске
+    return date.setZone("Europe/Minsk").toFormat("HH:mm");
+  } else {
+    // Если сообщение не сегодня, показываем полную дату и время в Минске
+    return date.setZone("Europe/Minsk").toFormat("yyyy.MM.dd HH:mm");
+  }
 };
 
 const ChatPage = () => {
@@ -25,18 +30,16 @@ const ChatPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [userId, setUserId] = useState(null);
-  const [userStatus, setUserStatus] = useState("Не в сети"); // Состояние для статуса
+  const [userStatus, setUserStatus] = useState("Не в сети");
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
-  const connection = useSignalR();
+  const { connection, handleError } = useSignalR();
   const messagesEndRef = useRef(null);
   const scrollRef = useRef(null);
   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
-  const handleError = useHandleError();
 
-  // Функция для получения userId
+  // Получение userId
   const fetchUserId = async () => {
     try {
       const response = await axios.get("https://localhost:7205/api/user/id", {
@@ -44,23 +47,20 @@ const ChatPage = () => {
       });
       setUserId(response.data);
     } catch (error) {
-      handleError(error, setErrorMessage);
+      handleError(error);
     }
   };
 
   // Загрузка сообщений
   const loadMessages = async () => {
-    if (loading || !hasMore || !userId) return; // Проверяем userId
+    if (loading || !hasMore || !userId) return;
 
     setLoading(true);
     try {
       const response = await axios.get(
         `https://localhost:7205/api/message/chat/${chatId}`,
         {
-          params: {
-            page,
-            pageSize: 20,
-          },
+          params: { page, pageSize: 20 },
           withCredentials: true,
         }
       );
@@ -88,8 +88,8 @@ const ChatPage = () => {
           setIsInitialLoadDone(true);
         }
       }
-    } catch (error) {
-      handleError(error, setErrorMessage);
+    } catch (err) {
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,9 @@ const ChatPage = () => {
     const initialConnection = async () => {
       if (connection && chatId && userId) {
         try {
-          //Вот здесь оно херится////////////////////////////////////////////////////////////
+          if (connection.state !== "Connected") {
+            await connection.start();
+          }
           await connection.invoke("JoinPrivateChatAsync", chatId);
           setIsConnected(true);
 
@@ -130,8 +132,8 @@ const ChatPage = () => {
               messagesEndRef.current.scrollIntoView({ behavior: "auto" });
             }
           }, 0);
-        } catch (error) {
-          handleError(error, setErrorMessage);
+        } catch (err) {
+          handleError(err);
         }
       }
     };
@@ -147,37 +149,49 @@ const ChatPage = () => {
         setIsConnected(false);
       }
     };
-  }, [connection, chatId, userId]); // Теперь добавляется зависимость от userId
+  }, [connection, handleError, chatId, userId]);
 
   // Отправка нового сообщения
   const handleSendMessage = async () => {
     if (!newMessage || !isConnected) return;
 
     try {
+      const timestamp = new Date().toISOString(); // Генерация времени в ISO-формате
+
       const sentMessage = {
         Id: Date.now(),
         Content: newMessage,
-        Timestamp: new Date().toISOString(),
+        Timestamp: timestamp, // Используем ISO-строку для отправки
         Sender: userName,
         IsSender: true,
       };
 
+      // Отправка сообщения на сервер
       await connection.invoke("SendPrivateChatMessageAsync", {
         PrivateChatId: chatId,
         Content: newMessage,
-        Timestamp: sentMessage.Timestamp,
+        Timestamp: timestamp,
       });
 
-      setMessages((prevMessages) => [...prevMessages, sentMessage]);
-      setNewMessage("");
+      // Добавление отправленного сообщения в локальное состояние
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          ...sentMessage,
+          Timestamp: timestamp, // Мы используем оригинальный ISO-строку для отображения
+        },
+      ]);
 
+      setNewMessage(""); // Очистка поля ввода
+
+      // Скроллинг в конец чата
       setTimeout(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
       }, 0);
-    } catch (error) {
-      handleError(error, setErrorMessage);
+    } catch (err) {
+      handleError(err);
     }
   };
 
@@ -188,7 +202,7 @@ const ChatPage = () => {
     }
   };
 
-  // Прокрутка в верх при загрузке старых сообщений
+  // Прокрутка вверх при загрузке старых сообщений
   const handleScroll = async () => {
     const scrollContainer = scrollRef.current;
 
@@ -213,9 +227,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     fetchUserId(); // Получаем userId при монтировании
-  }, []); // Вызывается один раз при монтировании
-
-  if (errorMessage) return <Error />;
+  }, []);
 
   return (
     <div className="chat-page">

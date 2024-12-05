@@ -1,92 +1,85 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
-import { useHandleError } from "./Scripts"; // Убедитесь, что этот хук подключен корректно
-import Error from "./components/Error"; // Компонент для отображения ошибок
+import Error from "./components/Error";
 
 const CHAT_HUB_URL = "https://localhost:7205/chatHub";
 const SignalRContext = createContext(null);
+
 let connection = null;
 
-const getSignalRConnection = async (handleError, setErrorMessage) => {
+const getSignalRConnection = async (handleError) => {
   if (!connection) {
     try {
       connection = new signalR.HubConnectionBuilder()
         .withUrl(CHAT_HUB_URL)
         .withAutomaticReconnect()
         .build();
-
       await connection.start();
       await connection.invoke("ConnectAsync");
-
-      // Убедитесь, что обработчик добавлен только один раз
-      if (!window.onbeforeunload) {
-        window.addEventListener("beforeunload", handleBeforeUnload);
-      }
     } catch (error) {
-      handleError(error, setErrorMessage);
       connection = null;
+      handleError(error);
     }
+    window.addEventListener("beforeunload", handleBeforeUnload);
   }
   return connection;
 };
 
 const handleBeforeUnload = async () => {
   if (connection) {
-    try {
-      await connection.invoke("DisconnectAsync");
-      await connection.stop();
-    } catch (error) {
-      console.error("Ошибка при остановке соединения:", error);
-    }
+    await connection.invoke("DisconnectAsync");
+    connection.stop();
+    connection = null;
   }
 };
 
 export const useSignalR = () => useContext(SignalRContext);
 
 export const SignalRProvider = ({ children }) => {
-  const [currentConnection, setCurrentConnection] = useState(null);
+  const [connection, setConnection] = useState(null);
+  const [error, setError] = useState(false);
   const location = useLocation();
-  const handleError = useHandleError();
-  const [errorMessage, setErrorMessage] = useState(false);
+  const navigate = useNavigate();
+
+  // Мемоизация handleError с помощью useCallback
+  const handleError = useCallback(
+    (error) => {
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        navigate("/login");
+      } else {
+        setError(true);
+        console.error(error);
+      }
+    },
+    [navigate]
+  );
 
   useEffect(() => {
+    if (location.pathname === "/login" || location.pathname === "/register") {
+      return;
+    }
+
     const initConnection = async () => {
-      if (location.pathname === "/login" || location.pathname === "/register") {
-        console.log("SignalR отключен на страницах входа и регистрации.");
-        if (currentConnection) {
-          try {
-            await currentConnection.invoke("DisconnectAsync");
-            await currentConnection.stop();
-            setCurrentConnection(null);
-          } catch (error) {
-            console.error("Ошибка при отключении SignalR:", error);
-          }
-        }
-        return;
+      if (!error) {
+        // Проверяем, что ошибки нет
+        const conn = await getSignalRConnection(handleError);
+        setConnection(conn);
       }
-
-      const conn = await getSignalRConnection(handleError, setErrorMessage);
-      setCurrentConnection(conn);
     };
-
     initConnection();
+  }, [handleError, location.pathname]);
 
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (currentConnection) {
-        currentConnection
-          .stop()
-          .catch((error) =>
-            console.error("Ошибка при остановке соединения:", error)
-          );
-      }
-    };
-  }, [location.pathname, handleError, currentConnection]);
-
+  // Если ошибка произошла, показываем компонент <Error />
   return (
-    <SignalRContext.Provider value={currentConnection}>
-      {errorMessage ? <Error /> : children}
+    <SignalRContext.Provider value={{ connection, handleError }}>
+      {error ? <Error /> : children}
     </SignalRContext.Provider>
   );
 };

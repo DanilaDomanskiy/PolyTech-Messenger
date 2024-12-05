@@ -9,11 +9,11 @@ body {
   font-family: "Roboto", Arial, sans-serif;
   background: linear-gradient(135deg, #d4eac7, #2c804c);
   display: flex;
-  justify-content: center; /* Центрируем по горизонтали */
-  align-items: center; /* Центрируем по вертикали */
-  height: 100vh; /* Высота равна высоте экрана */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   margin: 0;
-  overflow: hidden; /* Убираем прокрутку */
+  overflow: hidden;
 }
 
 .container {
@@ -21,26 +21,26 @@ body {
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 700px;
-  max-width: 100%; /* Ограничиваем максимальную ширину */
+  max-width: 100%;
   padding: 0px;
   padding-bottom: 20px;
   text-align: center;
   margin: 10px 0;
-  height: 90vh; /* Задаем контейнеру высоту 90vh */
+  height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden; /* Убираем прокрутку внутри контейнера */
+  overflow: hidden;
 }
 
 /* Стили для контейнера поиска */
 .search-container {
   position: relative;
   width: 100%;
-  margin-bottom: 10px; /* Добавим отступ снизу */
-  background-color: #2c804c; /* Зеленая шапка */
-  padding: 20px 0; /* Отступы сверху и снизу */
-  border-radius: 10px 10px 0px 0px; /* Закруглим углы */
+  margin-bottom: 10px;
+  background-color: #2c804c;
+  padding: 20px 0;
+  border-radius: 10px 10px 0px 0px;
 }
 
 /* Стили для поля поиска */
@@ -53,8 +53,8 @@ body {
   font-size: 14px;
   outline: none;
   transition: border-color 0.3s;
-  background-color: #fff; /* Белый фон для поля */
-  z-index: 1; /* Убедимся, что поле поиска будет на переднем плане */
+  background-color: #fff;
+  z-index: 1;
 }
 
 .search-input:focus {
@@ -108,14 +108,7 @@ body {
 #content {
   text-align: left;
   flex-grow: 1;
-  overflow-y: auto; /* Добавляем прокрутку только для контента */
-}
-
-.title {
-  font-size: 24px;
-  color: #2c804c;
-  margin-bottom: 10px;
-  text-align: center;
+  overflow-y: auto;
 }
 
 #content p {
@@ -132,38 +125,107 @@ body {
   margin: 10px;
 }
 
-/* Элемент списка чатов */
+/* Стили для элемента списка чатов */
 #privateMessages li,
 #groupMessages li {
   display: flex;
   align-items: center;
-  padding: 5px;
+  padding: 10px;
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 6px;
   margin-bottom: 10px;
   transition: background-color 0.2s, box-shadow 0.2s;
   cursor: pointer;
+  position: relative;
+  justify-content: flex-start; /* Распределяем элементы от левого края */
 }
 
+/* Убираем дополнительные отступы */
+#privateMessages li:first-child,
+#groupMessages li:first-child {
+  margin-top: 0;
+}
+
+/* Стили для hover эффекта */
 #privateMessages li:hover,
 #groupMessages li:hover {
   background-color: #e9f5ec;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Название чата */
-#privateMessages li span,
-#groupMessages li span {
-  font-size: 20px;
-  color: #333;
+/* Стили для изображения */
+#privateMessages li img,
+#groupMessages li img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* Круглое изображение */
+  margin-right: 15px;
+  object-fit: cover; /* Обрезка изображения по кругу */
 }
 
-/* Стили для пустого состояния чатов */
-#privateMessages p,
-#groupMessages p {
-  font-size: 16px;
-  color: #666;
-  text-align: center;
-  margin: 20px 0;
+/* Стиль для контейнера с изображением */
+.profile-container {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px; /* Отступ от изображения */
+}
+
+/* Стиль для индикатора статуса */
+.status-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: green; /* Зеленый цвет для статуса "в сети" */
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Стили для блока с деталями чата */
+#privateMessages li .chat-details,
+#groupMessages li .chat-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  flex-grow: 1;
+  padding-right: 20px; /* Отступ для правого блока */
+}
+
+/* Название чата */
+#privateMessages li .chat-details span.name,
+#groupMessages li .chat-details span.name {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 5px; /* Отступ между именем и последним сообщением */
+}
+
+/* Стили для количества непрочитанных сообщений */
+#privateMessages li .chat-details .unread-count,
+#groupMessages li .chat-details .unread-count {
+  background-color: #2c804c;
+  color: #fff;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+/* Последнее сообщение */
+#privateMessages li .chat-details .last-message,
+#groupMessages li .chat-details .last-message {
+  font-size: 14px;
+  color: #888;
+  margin-top: 5px;
 }

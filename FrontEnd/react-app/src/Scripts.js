@@ -8,7 +8,6 @@ export function useHandleError() {
       navigate("/login");
     } else {
       setError(true);
-      console.error(error);
     }
   };
 }

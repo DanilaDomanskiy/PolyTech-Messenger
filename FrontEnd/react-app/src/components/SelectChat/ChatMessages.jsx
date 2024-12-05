@@ -3,49 +3,50 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import "../../pages/SelectChat/SelectChat.css";
-import { useHandleError } from "../../Scripts";
-import Error from "../../components/Error";
+import avatar from "../../assets/images/download.png";
 
 const ChatMessages = () => {
   const [chats, setChats] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const connection = useSignalR();
+  const { connection, handleError } = useSignalR();
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState(false);
-  const handleError = useHandleError();
 
   useEffect(() => {
     const connectSignalR = async () => {
       if (connection) {
         try {
-          await connection.on(
-            "ReceivePrivateChatMessages",
-            (chatId, message) => {
-              setChats((prevChats) =>
-                prevChats.map((chat) =>
-                  chat.id === chatId
-                    ? {
-                        ...chat,
-                        lastMessage: message, // Обновляем последнее сообщение
-                        unreadMessagesCount: chat.unreadMessagesCount + 1, // Увеличиваем количество непрочитанных
-                      }
-                    : chat
-                )
-              );
-            }
-          );
-        } catch (error) {
-          handleError(error, setErrorMessage);
+          connection.on("ReceivePrivateChatMessages", (chatId, message) => {
+            setChats((prevChats) =>
+              prevChats.map((chat) =>
+                chat.id === chatId
+                  ? {
+                      ...chat,
+                      lastMessage: message,
+                      unreadMessagesCount: chat.unreadMessagesCount + 1,
+                    }
+                  : chat
+              )
+            );
+          });
+
+          connection.on("IsActiveUser", (userId, isActive) => {
+            setChats((prevChats) =>
+              prevChats.map((chat) =>
+                chat.secondUser.id === userId ? { ...chat, isActive } : chat
+              )
+            );
+          });
+        } catch (err) {
+          handleError(err); // Обработка ошибки через провайдер
         }
       }
     };
 
     connectSignalR();
 
-    // Отключение соединения при размонтировании компонента
     return () => {
       if (connection) {
         connection.off("ReceivePrivateChatMessages");
+        connection.off("IsActiveUser");
       }
     };
   }, [connection, handleError]);
@@ -59,17 +60,17 @@ const ChatMessages = () => {
             withCredentials: true,
           }
         );
+
         setChats(response.data);
-        setLoading(false);
-      } catch (error) {
-        handleError(error, setErrorMessage);
+      } catch (err) {
+        handleError(err); // Обработка ошибки через провайдер
       }
     };
+
     fetchChats();
-  }, []);
+  }, [handleError]);
 
   const handleChatClick = (chatId, userName) => {
-    // Если чат открыт, сбрасываем количество непрочитанных сообщений
     setChats((prevChats) =>
       prevChats.map((chat) =>
         chat.id === chatId ? { ...chat, unreadMessagesCount: 0 } : chat
@@ -78,93 +79,35 @@ const ChatMessages = () => {
     navigate("/chat", { state: { chatId, userName } });
   };
 
-  if (loading) {
-    return <p>Загрузка чатов...</p>;
-  }
-
-  if (errorMessage) return <Error />;
-
   return (
     <div id="privateMessages">
-      {chats.length > 0 ? (
-        <ul>
-          {chats.map((chat) => (
-            <li
-              key={chat.id}
-              onClick={() => handleChatClick(chat.id, chat.secondUser.name)}
-              style={{
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "flex-start",
-                marginBottom: "10px", // Отступ между чатов
-              }}
-            >
-              {/* Картинка пользователя */}
-              <img
-                src={
-                  chat.secondUser.profileImagePath || "defaultProfileImage.jpg"
-                } // Если изображения нет, используем дефолтное
-                alt={`${chat.secondUser.name}'s profile`}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "50%",
-                  marginRight: "15px",
-                }}
-              />
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  alignItems: "flex-start",
-                  position: "relative",
-                }}
-              >
-                <span>{chat.secondUser.name}</span>
+      <ul>
+        {chats.map((chat) => (
+          <li
+            key={chat.id}
+            onClick={() => handleChatClick(chat.id, chat.secondUser.name)}
+          >
+            <div className="profile-container">
+              <img src={avatar} alt={`${chat.secondUser.name}'s profile`} />
+              {chat.secondUser.isActive && <div className="status-indicator" />}
+            </div>
 
-                {/* Отображаем количество непрочитанных сообщений */}
-                {chat.unreadMessagesCount > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "0",
-                      right: "-30px",
-                      backgroundColor: "gray",
-                      color: "#fff",
-                      borderRadius: "50%",
-                      padding: "5px 10px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {chat.unreadMessagesCount}
-                  </span>
+            <div className="chat-details">
+              <span className="name">{chat.secondUser.name}</span>
+              {chat.unreadMessagesCount > 0 && (
+                <span className="unread-count">{chat.unreadMessagesCount}</span>
+              )}
+              <div className="last-message">
+                {chat.lastMessage ? (
+                  <span>{chat.lastMessage.content}</span>
+                ) : (
+                  <span>Нет сообщений</span>
                 )}
-
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    marginTop: "5px",
-                  }}
-                >
-                  {chat.lastMessage ? (
-                    <span style={{ color: "#888", fontSize: "14px" }}>
-                      {chat.lastMessage.content}
-                    </span>
-                  ) : (
-                    <span style={{ color: "#888", fontSize: "14px" }}>
-                      Нет сообщений
-                    </span>
-                  )}
-                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Чаты не найдены.</p>
-      )}
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
