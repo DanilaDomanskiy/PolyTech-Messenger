@@ -12,6 +12,7 @@ namespace Web.API
         private readonly IPrivateChatService _privateChatService;
         private readonly IUserService _userService;
         private readonly IGroupService _groupService;
+        private readonly ILogger<ChatHub> _logger;
 
         public ChatHub(
             IMessageService messageService,
@@ -19,7 +20,8 @@ namespace Web.API
             IUserConnectionService userConnectionService,
             IPrivateChatService privateChatService,
             IUserService userService,
-            IGroupService groupService)
+            IGroupService groupService,
+            ILogger<ChatHub> logger)
         {
             _messageService = messageService;
             _httpContextAccessor = httpContextAccessor;
@@ -27,12 +29,17 @@ namespace Web.API
             _privateChatService = privateChatService;
             _userService = userService;
             _groupService = groupService;
+            _logger = logger;
         }
 
         public async Task JoinPrivateChatAsync(Guid privateChatId)
         {
+            _logger.LogInformation("User {UserId} is attempting to join private chat {PrivateChatId}", Context.UserIdentifier, privateChatId);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
             await _userConnectionService.SetActivePrivateChatAsync(Context.ConnectionId, privateChatId);
+
+            _logger.LogInformation("User {UserId} has joined private chat {PrivateChatId}", Context.UserIdentifier, privateChatId);
         }
 
         public async Task LeavePrivateChatAsync(Guid privateChatId)
@@ -42,16 +49,22 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is leaving private chat {PrivateChatId}", userId, privateChatId);
                 await _userConnectionService.SetActivePrivateChatAsync(Context.ConnectionId, null);
             }
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
+            _logger.LogInformation("User {UserId} has left private chat {PrivateChatId}", userId, privateChatId);
         }
 
         public async Task JoinGroupAsync(Guid groupId)
         {
+            _logger.LogInformation("User {UserId} is attempting to join group {GroupId}", Context.UserIdentifier, groupId);
+
             await Groups.AddToGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
             await _userConnectionService.SetActiveGroupAsync(Context.ConnectionId, groupId);
+
+            _logger.LogInformation("User {UserId} has joined group {GroupId}", Context.UserIdentifier, groupId);
         }
 
         public async Task LeaveGroupAsync(Guid groupId)
@@ -61,10 +74,12 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is leaving group {GroupId}", userId, groupId);
                 await _userConnectionService.SetActiveGroupAsync(Context.ConnectionId, null);
             }
 
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
+            _logger.LogInformation("User {UserId} has left group {GroupId}", userId, groupId);
         }
 
         public async Task ConnectAsync()
@@ -74,8 +89,10 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is connecting", userId);
                 await _userConnectionService.AddConnectionAsync(userId, Context.ConnectionId);
                 await SendIsActiveUser(userId, true);
+                _logger.LogInformation("User {UserId} has connected", userId);
             }
         }
 
@@ -86,15 +103,18 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is disconnecting", userId);
                 await _userConnectionService.RemoveConnectionAsync(Context.ConnectionId);
                 await SendIsActiveUser(userId, false);
+                _logger.LogInformation("User {UserId} has disconnected", userId);
             }
         }
 
         private async Task SendIsActiveUser(Guid userId, bool isActive)
         {
-            var connections = await _userConnectionService.GetAllConnectionsAsync(userId);
+            _logger.LogInformation("Updating activity status for user {UserId} to {IsActive}", userId, isActive);
 
+            var connections = await _userConnectionService.GetAllConnectionsAsync(userId);
             if (connections?.Any() == true)
             {
                 foreach (var connection in connections)
@@ -102,6 +122,8 @@ namespace Web.API
                     await Clients.Client(connection).SendAsync("IsActiveUser", userId, isActive);
                 }
             }
+
+            _logger.LogInformation("Successfully updated activity status for user {UserId} to {IsActive}", userId, isActive);
         }
 
         public async Task SendPrivateChatMessageAsync(SendChatMessageDto model)
@@ -111,6 +133,8 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is sending a message to private chat {PrivateChatId}", userId, model.PrivateChatId);
+
                 if (!await _privateChatService.IsUserExistInChatAsync(userId, model.PrivateChatId)) return;
 
                 var message = new SaveMessageDto
@@ -131,10 +155,9 @@ namespace Web.API
                     SenderId = userId
                 };
 
-                await Clients.GroupExcept("pc" + model.PrivateChatId, Context.ConnectionId).SendAsync("ReceivePrivateChatMessage", dto);
+                await Clients.Group("pc" + model.PrivateChatId).SendAsync("ReceivePrivateChatMessage", dto);
 
                 var usersConnections = await _userConnectionService.GetConnectionsByChatIdAsync(model.PrivateChatId);
-
                 if (usersConnections?.Any() == true)
                 {
                     foreach (var connection in usersConnections)
@@ -147,6 +170,7 @@ namespace Web.API
                 }
 
                 await _privateChatService.UpdateUnreadMessagesAsync(model.PrivateChatId, userId);
+                _logger.LogInformation("Message sent to private chat {PrivateChatId} by user {UserId}", model.PrivateChatId, userId);
             }
         }
 
@@ -157,6 +181,8 @@ namespace Web.API
 
             if (Guid.TryParse(userIdClaim, out Guid userId))
             {
+                _logger.LogInformation("User {UserId} is sending a message to group {GroupId}", userId, model.GroupId);
+
                 if (!await _groupService.IsUserExistInGroupAsync(userId, model.GroupId)) return;
 
                 var message = new SaveMessageDto
@@ -183,10 +209,9 @@ namespace Web.API
                     }
                 };
 
-                await Clients.GroupExcept("g" + model.GroupId, Context.ConnectionId).SendAsync("ReceiveGroupMessage", dto);
+                await Clients.Group("g" + model.GroupId).SendAsync("ReceiveGroupMessage", dto);
 
                 var usersConnections = await _userConnectionService.GetConnectionsByGroupIdAsync(model.GroupId);
-
                 if (usersConnections?.Any() == true)
                 {
                     foreach (var connection in usersConnections)
@@ -199,6 +224,7 @@ namespace Web.API
                 }
 
                 await _groupService.UpdateUnreadMessagesAsync(model.GroupId, userId);
+                _logger.LogInformation("Message sent to group {GroupId} by user {UserId}", model.GroupId, userId);
             }
         }
     }

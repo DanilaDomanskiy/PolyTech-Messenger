@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Runtime.ConstrainedExecution;
 using Web.Core.Entities;
 using Web.Core.IRepositories;
 
@@ -15,7 +14,7 @@ namespace Web.Persistence.Repositories
         {
             return await _context.PrivateChats
                 .AsNoTracking()
-                .Where(pc => pc.Users.Any(user => user.Id == userId) && pc.Messages.Any())
+                .Where(pc => pc.Users.Any(user => user.Id == userId) && pc.Messages.Count != 0)
                 .Select(pc => new PrivateChat
                 {
                     Id = pc.Id,

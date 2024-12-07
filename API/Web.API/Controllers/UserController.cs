@@ -11,22 +11,28 @@ namespace Web.API.Controllers
     {
         private readonly IUserService _userService;
         private readonly string _folderPath;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserService userService, IConfiguration configuration)
+        public UserController(IUserService userService, IConfiguration configuration, ILogger<UserController> logger)
         {
             _userService = userService;
             _folderPath = configuration["FileStorageSettings:UploadFolderPath"];
+            _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto model)
         {
+            _logger.LogInformation("Registering a new user with email {Email}", model.Email);
+
             try
             {
                 await _userService.AddUserAsync(model);
+                _logger.LogInformation("User with email {Email} registered successfully", model.Email);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
+                _logger.LogWarning(ex, "User with email {Email} already exists", model.Email);
                 return StatusCode(409);
             }
 
@@ -36,12 +42,17 @@ namespace Web.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthUserDto user)
         {
+            _logger.LogInformation("Attempting to login user with email {Email}", user.Login);
+
             var token = await _userService.LoginUserAsync(user);
 
             if (token == null)
             {
+                _logger.LogWarning("Failed login attempt for email {Email}", user.Login);
                 return StatusCode(409);
             }
+
+            _logger.LogInformation("User with email {Email} logged in successfully", user.Login);
 
             var cookieOptions = new CookieOptions
             {
@@ -59,9 +70,12 @@ namespace Web.API.Controllers
         [HttpPost("logout")]
         public IActionResult Logout()
         {
+            _logger.LogInformation("Logging out the user");
+
             if (Request.Cookies.ContainsKey("AppCookie"))
             {
                 Response.Cookies.Delete("AppCookie");
+                _logger.LogInformation("User logged out and cookie deleted");
             }
 
             return NoContent();
@@ -74,9 +88,11 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("User with ID {UserId} is searching for email {Email}", currentUserId, email);
                 var users = await _userService.SearchByEmailAsync(email, currentUserId);
                 return Ok(users);
             }
+            _logger.LogWarning("Unauthorized access attempt while searching for email {Email}", email);
             return Unauthorized();
         }
 
@@ -87,8 +103,10 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("Retrieving user ID for user with ID {UserId}", currentUserId);
                 return Ok(currentUserId);
             }
+            _logger.LogWarning("Unauthorized access attempt to get user ID");
             return Unauthorized();
         }
 
@@ -99,6 +117,8 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("User with ID {UserId} is updating profile image", currentUserId);
+
                 string profileImagesFolder = Path.Combine(_folderPath, "profile-images");
 
                 Directory.CreateDirectory(profileImagesFolder);
@@ -111,11 +131,16 @@ namespace Web.API.Controllers
                         .FirstOrDefault();
                     if (oldFile != null) System.IO.File.Delete(oldFile);
                     await _userService.UpdateProfileImageAsync(currentUserId, null);
+                    _logger.LogInformation("Profile image deleted for user with ID {UserId}", currentUserId);
                     return Created();
                 }
                 else
                 {
-                    if (file.Length > 5 * 1024 * 1024) return StatusCode(409);
+                    if (file.Length > 5 * 1024 * 1024)
+                    {
+                        _logger.LogWarning("File size is too large for user with ID {UserId}", currentUserId);
+                        return StatusCode(409);
+                    }
 
                     try
                     {
@@ -123,6 +148,7 @@ namespace Web.API.Controllers
                     }
                     catch (SixLabors.ImageSharp.UnknownImageFormatException)
                     {
+                        _logger.LogWarning("Invalid image format for user with ID {UserId}", currentUserId);
                         return StatusCode(409);
                     }
                 }
@@ -141,9 +167,11 @@ namespace Web.API.Controllers
                 }
 
                 await _userService.UpdateProfileImageAsync(currentUserId, path);
+                _logger.LogInformation("Profile image updated successfully for user with ID {UserId}", currentUserId);
 
                 return Created();
             }
+            _logger.LogWarning("Unauthorized access attempt to update profile image");
             return Unauthorized();
         }
 
@@ -154,8 +182,11 @@ namespace Web.API.Controllers
             var fileFullPath = Path.Combine(_folderPath, imagePath);
             if (!System.IO.File.Exists(fileFullPath))
             {
+                _logger.LogWarning("Profile image not found at path {ImagePath}", imagePath);
                 return NotFound();
             }
+
+            _logger.LogInformation("Serving profile image from path {ImagePath}", imagePath);
             return PhysicalFile(fileFullPath, "application/octet-stream");
         }
 
@@ -166,13 +197,16 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("Retrieving current user information for user with ID {UserId}", currentUserId);
                 var user = await _userService.GetUserAsync(currentUserId);
                 if (user == null)
                 {
+                    _logger.LogWarning("User with ID {UserId} not found", currentUserId);
                     return NotFound();
                 }
                 return Ok(user);
             }
+            _logger.LogWarning("Unauthorized access attempt to retrieve user information");
             return Unauthorized();
         }
 
@@ -180,6 +214,7 @@ namespace Web.API.Controllers
         [HttpGet("not-in-group/{groupId}")]
         public async Task<IActionResult> GetNoGroupUsers(string email, Guid groupId)
         {
+            _logger.LogInformation("Retrieving users not in group {GroupId} with email {Email}", groupId, email);
             var users = await _userService.GetNoGroupUsersAsync(email, groupId);
             return Ok(users);
         }
@@ -191,9 +226,11 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("User with ID {UserId} is updating their name", currentUserId);
                 await _userService.UpdateUserNameAsync(currentUserId, userNameDto);
                 return NoContent();
             }
+            _logger.LogWarning("Unauthorized access attempt to update name");
             return Unauthorized();
         }
 
@@ -204,20 +241,25 @@ namespace Web.API.Controllers
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("User with ID {UserId} is updating their password", currentUserId);
+
                 try
                 {
                     await _userService.UpdateUserPasswordAsync(currentUserId, updatePasswordDto);
                     if (Request.Cookies.ContainsKey("AppCookie"))
                     {
                         Response.Cookies.Delete("AppCookie");
+                        _logger.LogInformation("User with ID {UserId} logged out and cookie deleted after password update", currentUserId);
                     }
                     return NoContent();
                 }
                 catch (InvalidOperationException)
                 {
+                    _logger.LogWarning("Failed password update attempt for user with ID {UserId}", currentUserId);
                     return StatusCode(409);
                 }
             }
+            _logger.LogWarning("Unauthorized access attempt to update password");
             return Unauthorized();
         }
     }
