@@ -10,8 +10,7 @@ ENV ASPNETCORE_URLS=http://+:7205 \
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /src
 COPY . .
-RUN dotnet restore Web.API/Web.API.csproj --disable-parallel=false
-RUN dotnet publish Web.API/Web.API.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish Web.API/Web.API.csproj -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app

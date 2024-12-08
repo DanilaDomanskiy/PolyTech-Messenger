@@ -71,6 +71,7 @@ namespace Web.Persistence.Repositories
                         })
                         .ToList()
                 })
+                .OrderByDescending(g => g.Messages.FirstOrDefault().Timestamp)
                 .ToListAsync();
         }
 

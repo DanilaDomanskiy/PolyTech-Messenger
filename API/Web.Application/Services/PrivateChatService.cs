@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Web.Application.Dto_s;
 using Web.Application.Dto_s.PrivateChat;
 using Web.Application.Services.Interfaces;
 using Web.Application.Services.Interfaces.IServices;
@@ -39,7 +38,7 @@ namespace Web.Application.Services
 
                 var lastMessage = chat.Messages.FirstOrDefault();
 
-                if (lastMessage != null)
+                if (lastMessage != null && lastMessage.Content.Length % 4 == 0)
                 {
                     lastMessage.Content = _encryptionService.Decrypt(lastMessage.Content);
                 }

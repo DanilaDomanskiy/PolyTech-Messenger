@@ -22,6 +22,7 @@ namespace Web.Persistence.Repositories
                     Messages = pc.Messages.OrderByDescending(m => m.Timestamp).Take(1).ToList(),
                     UnreadMessages = pc.UnreadMessages.Where(um => um.UserId == userId).ToList()
                 })
+                .OrderByDescending(pc => pc.Messages.FirstOrDefault().Timestamp)
                 .ToListAsync();
         }
 
