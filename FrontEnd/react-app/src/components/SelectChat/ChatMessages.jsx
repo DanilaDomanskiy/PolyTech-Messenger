@@ -7,9 +7,27 @@ import avatar from "../../assets/images/download.png";
 
 const ChatMessages = () => {
   const [chats, setChats] = useState([]);
+  const [userId, setUserId] = useState(null); // Хранение текущего userId
   const { connection, handleError } = useSignalR();
   const navigate = useNavigate();
 
+  // Получение текущего userId
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await axios.get("https://localhost:7205/api/user/id", {
+          withCredentials: true,
+        });
+        setUserId(response.data);
+      } catch (err) {
+        handleError(err); // Обработка ошибки через провайдер
+      }
+    };
+
+    fetchUserId();
+  }, [handleError]);
+
+  // Подключение SignalR
   useEffect(() => {
     const connectSignalR = async () => {
       if (connection) {
@@ -31,12 +49,14 @@ const ChatMessages = () => {
           connection.on("IsActiveUser", (userId, isActive) => {
             setChats((prevChats) =>
               prevChats.map((chat) =>
-                chat.secondUser.id === userId ? { ...chat, isActive } : chat
+                chat.secondUser.id === userId
+                  ? { ...chat, secondUser: { ...chat.secondUser, isActive } }
+                  : chat
               )
             );
           });
         } catch (err) {
-          handleError(err); // Обработка ошибки через провайдер
+          handleError(err);
         }
       }
     };
@@ -51,6 +71,7 @@ const ChatMessages = () => {
     };
   }, [connection, handleError]);
 
+  // Загрузка списка чатов
   useEffect(() => {
     const fetchChats = async () => {
       try {
@@ -63,13 +84,14 @@ const ChatMessages = () => {
 
         setChats(response.data);
       } catch (err) {
-        handleError(err); // Обработка ошибки через провайдер
+        handleError(err);
       }
     };
 
     fetchChats();
   }, [handleError]);
 
+  // Обработка клика по чату
   const handleChatClick = (chatId, userName) => {
     setChats((prevChats) =>
       prevChats.map((chat) =>
@@ -77,6 +99,18 @@ const ChatMessages = () => {
       )
     );
     navigate("/chat", { state: { chatId, userName } });
+  };
+
+  // Отображение последнего сообщения
+  const renderLastMessage = (lastMessage, secondUser) => {
+    const isSentByCurrentUser = lastMessage.senderId === userId;
+
+    return (
+      <span>
+        {isSentByCurrentUser ? "Вы: " : `${secondUser.name || ""}: `}
+        {lastMessage.content}
+      </span>
+    );
   };
 
   return (
@@ -98,11 +132,7 @@ const ChatMessages = () => {
                 <span className="unread-count">{chat.unreadMessagesCount}</span>
               )}
               <div className="last-message">
-                {chat.lastMessage ? (
-                  <span>{chat.lastMessage.content}</span>
-                ) : (
-                  <span>Нет сообщений</span>
-                )}
+                {renderLastMessage(chat.lastMessage, chat.secondUser)}
               </div>
             </div>
           </li>

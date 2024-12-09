@@ -30,7 +30,10 @@ const ChatPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [userId, setUserId] = useState(null);
-  const [userStatus, setUserStatus] = useState("Не в сети");
+  const [userStatus, setUserStatus] = useState({
+    isActive: false,
+    lastActive: null,
+  });
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
@@ -57,6 +60,18 @@ const ChatPage = () => {
 
     setLoading(true);
     try {
+      const responseForLastActive = await axios.get(
+        `https://localhost:7205/api/chat/${chatId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setUserStatus({
+        isActive: responseForLastActive.data.secondUser.isActive,
+        lastActive: responseForLastActive.data.secondUser.lastActive,
+      });
+
       const response = await axios.get(
         `https://localhost:7205/api/message/chat/${chatId}`,
         {
@@ -64,6 +79,7 @@ const ChatPage = () => {
           withCredentials: true,
         }
       );
+      console.log(response.data);
 
       const newMessages = Array.isArray(response.data)
         ? response.data
@@ -125,6 +141,16 @@ const ChatPage = () => {
             }, 0);
           });
 
+          connection.on("IsActiveUser", (updatedUserId, isActive) => {
+            if (updatedUserId === userId) return; // Игнорируем изменения для текущего пользователя
+
+            setUserStatus((prevStatus) => ({
+              ...prevStatus,
+              isActive,
+              lastActive: isActive ? null : DateTime.now().toISO(), // Обновляем время, если пользователь стал неактивным
+            }));
+          });
+
           await loadMessages();
 
           setTimeout(() => {
@@ -146,6 +172,7 @@ const ChatPage = () => {
       if (connection && chatId) {
         connection.off("ReceivePrivateChatMessage");
         connection.invoke("LeavePrivateChatAsync", chatId);
+        connection.off("IsActiveUser");
         setIsConnected(false);
       }
     };
@@ -161,7 +188,7 @@ const ChatPage = () => {
       const sentMessage = {
         Id: Date.now(),
         Content: newMessage,
-        Timestamp: timestamp, // Используем ISO-строку для отправки
+        Timestamp: timestamp,
         Sender: userName,
         IsSender: true,
       };
@@ -229,11 +256,22 @@ const ChatPage = () => {
     fetchUserId(); // Получаем userId при монтировании
   }, []);
 
+  const getUserStatus = (isActive, lastActive) => {
+    if (isActive) {
+      return "В сети";
+    }
+
+    return "Последний раз в сети: " + formatDate(lastActive);
+  };
+
   return (
     <div className="chat-page">
       <div className="chat-header">
         <h3>{userName}</h3>
-        <span className="status">{userStatus}</span>
+        <span className="status">
+          {" "}
+          {getUserStatus(userStatus.isActive, userStatus.lastActive)}
+        </span>
       </div>
 
       <div className="chat-messages" onScroll={handleScroll} ref={scrollRef}>
