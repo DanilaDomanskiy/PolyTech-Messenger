@@ -1,0 +1,10 @@
+{
+  "chat": {
+    "statusOnline": "В сети",
+    "statusOffline": "Последний раз в сети: {{lastActive}}",
+    "placeholder": "Введите сообщение...",
+    "send": "Отправить",
+    "you": "Вы",
+    "selectLanguage": "Выбор языка"
+  }
+}

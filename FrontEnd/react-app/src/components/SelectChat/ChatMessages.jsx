@@ -4,12 +4,14 @@ import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import "../../pages/SelectChat/SelectChat.css";
 import avatar from "../../assets/images/download.png";
+import { useTranslation } from "react-i18next";
 
 const ChatMessages = () => {
   const [chats, setChats] = useState([]);
   const [userId, setUserId] = useState(null); // Хранение текущего userId
   const { connection, handleError } = useSignalR();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   // Получение текущего userId
   useEffect(() => {

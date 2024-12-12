@@ -1,0 +1,10 @@
+{
+  "chat": {
+    "statusOnline": "Online",
+    "statusOffline": "Last seen: {{lastActive}}",
+    "placeholder": "Enter message...",
+    "send": "Send",
+    "you": "You",
+    "selectLanguage": "Select language"
+  }
+}

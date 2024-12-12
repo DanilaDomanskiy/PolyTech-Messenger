@@ -20,7 +20,7 @@ body {
   background-color: #fff;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 700px;
+  width: 800px;
   max-width: 100%;
   padding: 0px;
   padding-bottom: 20px;
@@ -31,49 +31,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-}
-
-/* Стили для контейнера поиска */
-.search-container {
-  position: relative;
-  width: 100%;
-  margin-bottom: 10px;
-  background-color: #2c804c;
-  padding: 20px 0;
-  border-radius: 10px 10px 0px 0px;
-}
-
-/* Стили для поля поиска */
-.search-input {
-  width: 90%;
-  padding: 8px 35px 8px 40px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s;
-  background-color: #fff;
-  z-index: 1;
-}
-
-.search-input:focus {
-  border-color: #2c804c;
-  box-shadow: 0 0 5px rgba(44, 128, 76, 0.5);
-}
-
-/* Стили для значка поиска */
-.search-icon {
-  position: absolute;
-  left: 50px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-}
-
-.search-icon:hover {
-  cursor: pointer;
 }
 
 /* Стили для кнопок */

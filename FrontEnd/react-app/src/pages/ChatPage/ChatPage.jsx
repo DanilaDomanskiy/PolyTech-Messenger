@@ -4,6 +4,8 @@ import "../ChatPage/ChatPage.css";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import { DateTime } from "luxon";
+import { useTranslation } from "react-i18next"; // Импорт useTranslation
+import i18n from "i18next";
 
 const formatDate = (dateString) => {
   const date = DateTime.fromISO(dateString, { zone: "utc" }).setZone(
@@ -41,6 +43,7 @@ const ChatPage = () => {
   const messagesEndRef = useRef(null);
   const scrollRef = useRef(null);
   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
+  const { t } = useTranslation();
 
   // Получение userId
   const fetchUserId = async () => {
@@ -258,10 +261,10 @@ const ChatPage = () => {
 
   const getUserStatus = (isActive, lastActive) => {
     if (isActive) {
-      return "В сети";
+      return t("chat.statusOnline");
     }
-
-    return "Последний раз в сети: " + formatDate(lastActive);
+    console.log(i18n.language); // Проверка текущего языка
+    return t("chat.statusOffline", { lastActive: formatDate(lastActive) });
   };
 
   return (
@@ -269,7 +272,6 @@ const ChatPage = () => {
       <div className="chat-header">
         <h3>{userName}</h3>
         <span className="status">
-          {" "}
           {getUserStatus(userStatus.isActive, userStatus.lastActive)}
         </span>
       </div>
@@ -295,10 +297,10 @@ const ChatPage = () => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Введите сообщение..."
+          placeholder={t("chat.placeholder")}
         />
         <button onClick={handleSendMessage} disabled={!isConnected}>
-          Отправить
+          {t("chat.send")}
         </button>
       </div>
     </div>

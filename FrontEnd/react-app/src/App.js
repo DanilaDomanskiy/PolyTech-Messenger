@@ -6,6 +6,7 @@ import ChatPage from "./pages/ChatPage/ChatPage";
 import { Routes, Route } from "react-router-dom";
 import "./styles/Global.css";
 import { SignalRProvider } from "./SignalRProvider";
+import "./i18n/i18n"; // Это подключение должно быть в файле, который запускается первым
 
 const App = () => {
   return (

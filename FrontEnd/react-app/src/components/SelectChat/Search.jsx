@@ -16,7 +16,7 @@ const Search = () => {
 
     try {
       const response = await axios.get(
-        `https://localhost:7205/api/user/searchByEmail`,
+        `https://localhost:7205/api/user/search`,
         {
           params: { email: query },
           withCredentials: true,
@@ -52,6 +52,14 @@ const Search = () => {
         onChange={handleChange}
       />
       <img src={search} alt="Поиск" className="search-icon" />
+
+      <div className="language-selector">
+        <select id="language-select">
+          <option value="ru">RU</option>
+          <option value="en">EN</option>
+          <option value="be">BY</option>
+        </select>
+      </div>
 
       {searchQuery &&
         users.length > 0 &&
