@@ -35,6 +35,24 @@
   height: 20px;
 }
 
+/* Стили для иконки настроек */
+.settings-icons {
+  position: absolute; /* Позиционирование иконки */
+  right: 2px; /* Отступ от правого края */
+  top: 50%; /* Центрируем по вертикали */
+  transform: translateY(-50%); /* Центрируем по вертикали */
+  width: 70px; /* Размер иконки */
+  height: 70px; /* Размер иконки */
+  cursor: pointer; /* Указатель при наведении */
+  transition: transform 0.3s, filter 0.3s; /* Плавные эффекты */
+}
+
+/* Эффект при наведении на иконку */
+.settings-icons:hover {
+  transform: translateY(-50%) scale(1.1); /* Легкое увеличение при наведении */
+  filter: brightness(1.2); /* Легкое увеличение яркости */
+}
+
 /* Список пользователей */
 .user-list {
   list-style-type: none;
@@ -77,46 +95,6 @@
 .user-list::-webkit-scrollbar-track {
   background-color: #f1f1f1; /* Цвет фона полосы прокрутки */
   border-radius: 10px; /* Закругление края полосы */
-}
-
-/* Стили для контейнера выбора языка */
-.language-selector {
-  margin-left: 10px; /* Отступ слева от поля поиска */
-  margin-right: 10px;
-}
-
-/* Стили для выпадающего списка */
-#language-select {
-  width: 60px; /* Устанавливаем фиксированную ширину */
-  padding: 8px 5px; /* Внутренние отступы для удобства */
-  font-size: 14px; /* Размер шрифта */
-  border-radius: 15px; /* Закругление углов */
-  border: 1px solid #ccc; /* Граница */
-  background-color: #fff; /* Цвет фона */
-  cursor: pointer; /* Указатель при наведении */
-  transition: border-color 0.3s, box-shadow 0.3s; /* Плавный переход при фокусе */
-}
-
-/* Эффект фокуса */
-#language-select:focus {
-  border-color: #2c804c; /* Цвет границы при фокусе */
-  box-shadow: 0 0 5px rgba(44, 128, 76, 0.5); /* Тень при фокусе */
-}
-
-/* Стили для выпадающего списка (options) */
-#language-select option {
-  padding: 8px 15px; /* Внутренние отступы для удобства */
-  font-size: 14px; /* Размер шрифта */
-  background-color: #fff; /* Цвет фона */
-  color: #333; /* Цвет текста */
-  border: none; /* Убираем рамки */
-  transition: background-color 0.3s; /* Плавный переход фона */
-}
-
-/* Эффект при наведении на option */
-#language-select option:hover {
-  background-color: #2c804c; /* Цвет фона при наведении */
-  color: #fff; /* Цвет текста при наведении */
 }
 
 /* Пользовательский элемент */
@@ -174,7 +152,7 @@
 .user-email {
   font-size: 13px;
   color: #777;
-  margin: 3px 0 0 0; /* Убираем лишние отступы сверху */
+  margin: 3px 0 0 0;
 }
 
 /* Псевдоэлементы для разделителей */

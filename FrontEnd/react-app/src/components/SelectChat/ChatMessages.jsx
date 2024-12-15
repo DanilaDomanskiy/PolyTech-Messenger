@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import "../../pages/SelectChat/SelectChat.css";
-import avatar from "../../assets/images/download.png";
+import avatar from "../../assets/images/Sergey.jpg";
 import { useTranslation } from "react-i18next";
 
 const ChatMessages = () => {

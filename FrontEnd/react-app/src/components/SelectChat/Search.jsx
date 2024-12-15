@@ -3,8 +3,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import search from "../../assets/images/search.png";
-import avatar from "../../assets/images/download.png";
+import avatar from "../../assets/images/download.jpg";
+import settingsIcons from "../../assets/images/Settings.png";
 import { useSignalR } from "../../SignalRProvider";
+import Settings from "../Settings/Settings";
 import "../../styles/Search.css";
 
 const Search = () => {
@@ -12,23 +14,18 @@ const Search = () => {
   const [users, setUsers] = useState([]);
   const [userSelected, setUserSelected] = useState(false); // Состояние для отслеживания выбора пользователя
   const { t, i18n } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
   const { handleError } = useSignalR();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState({
+    userName: "",
+    profileImage: "",
+  });
   const navigate = useNavigate();
-
-  // Сохранение выбранного языка в локальном хранилище
-  const handleLanguageChange = (e) => {
-    const selectedLanguage = e.target.value;
-    i18n.changeLanguage(selectedLanguage); // Меняем язык
-    setCurrentLanguage(selectedLanguage); // Обновляем состояние
-    localStorage.setItem("appLanguage", selectedLanguage); // Сохраняем язык в localStorage
-  };
 
   useEffect(() => {
     // При загрузке компонента проверяем, сохранен ли язык в localStorage
     const savedLanguage = localStorage.getItem("appLanguage") || "ru"; // По умолчанию русский
     i18n.changeLanguage(savedLanguage); // Устанавливаем язык в i18n
-    setCurrentLanguage(savedLanguage); // Обновляем состояние
   }, []);
 
   const handleSearch = async (query) => {
@@ -82,6 +79,32 @@ const Search = () => {
     setUserSelected(true);
   };
 
+  useEffect(() => {
+    const handleGetUser = async () => {
+      try {
+        const response = await axios.get(`https://localhost:7205/api/user`, {
+          withCredentials: true,
+        });
+        setCurrentUser({
+          userName: response.data.name,
+          profileImage: response.data.profileImagePath,
+        });
+      } catch (error) {
+        handleError(error);
+      }
+    };
+
+    handleGetUser();
+  }, []);
+
+  const openSettings = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeSettings = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="search-container">
       <input
@@ -94,17 +117,21 @@ const Search = () => {
       />
       <img src={search} alt={t("search_icon")} className="search-icon" />
 
-      <div className="language-selector">
-        <select
-          id="language-select"
-          value={currentLanguage}
-          onChange={handleLanguageChange}
-        >
-          <option value="ru">RU</option>
-          <option value="en">EN</option>
-          <option value="be">BE</option>
-        </select>
-      </div>
+      <img
+        src={settingsIcons}
+        alt="icons"
+        className="settings-icons"
+        onClick={openSettings}
+      />
+
+      {/* Модальное окно для настроек */}
+      {isModalOpen && (
+        <Settings
+          onClose={closeSettings}
+          userName={currentUser.userName}
+          profileImage={currentUser.profileImage}
+        />
+      )}
 
       {searchQuery &&
         users.length > 0 &&
