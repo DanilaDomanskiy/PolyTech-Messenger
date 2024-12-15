@@ -4,7 +4,7 @@ namespace Web.Application.Services.Interfaces.IServices
 {
     public interface IMessageService
     {
-        Task<IEnumerable<ReadGroupMessageDto>?> GetGroupMessagesAsync(Guid groupId, Guid userId, int page, int pageSize);
+        Task<IEnumerable<ReceiveGroupMessageDto>?> GetGroupMessagesAsync(Guid groupId, Guid userId, int page, int pageSize);
 
         Task<IEnumerable<ReceiveChatMessageDto>?> GetChatMessagesAsync(Guid chatId, Guid userId, int page, int pageSize);
 

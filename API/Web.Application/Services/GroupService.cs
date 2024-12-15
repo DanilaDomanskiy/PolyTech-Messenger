@@ -73,7 +73,7 @@ namespace Web.Application.Services
                         }
                     }
                 };
-            });
+            }).ToList();
         }
 
         public async Task<GroupItemDto?> GetGroupAsync(Guid groupId, Guid userId)

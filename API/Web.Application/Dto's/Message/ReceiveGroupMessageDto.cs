@@ -6,7 +6,7 @@
         public string Content { get; set; }
         public DateTime Timestamp { get; set; }
         public Guid GroupId { get; set; }
-        public Sender? Sender { get; set; }
+        public Sender Sender { get; set; }
     }
 
     public class Sender

@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Web.Application.Services.Interfaces;
 
 namespace Web.Infrastructure
@@ -12,43 +12,64 @@ namespace Web.Infrastructure
         public EncryptionService(IConfiguration configuration)
         {
             _key = configuration["EncryptionSettings:Key"];
+            if (string.IsNullOrWhiteSpace(_key) || _key.Length != 32)
+            {
+                throw new ArgumentException("Encryption key must be a 32-character string.");
+            }
         }
 
         public string Encrypt(string plainText)
         {
-            using (Aes aesAlg = Aes.Create())
+            if (string.IsNullOrEmpty(plainText))
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(_key);
-                aesAlg.IV = new byte[16];
+                throw new ArgumentException("The text to encrypt cannot be null or empty.");
+            }
 
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+            using (var aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(_key);
+                aes.GenerateIV();
 
-                using (MemoryStream msEncrypt = new MemoryStream())
+                using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                using (var memoryStream = new MemoryStream())
                 {
-                    using CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
-                    using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                    memoryStream.Write(aes.IV, 0, aes.IV.Length);
+                    using (var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                    using (var writer = new StreamWriter(cryptoStream))
                     {
-                        swEncrypt.Write(plainText);
+                        writer.Write(plainText);
                     }
-
-                    return Convert.ToBase64String(msEncrypt.ToArray());
+                    return Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
         }
 
         public string Decrypt(string cipherText)
         {
-            using (Aes aesAlg = Aes.Create())
+            if (string.IsNullOrEmpty(cipherText))
             {
-                aesAlg.Key = Encoding.UTF8.GetBytes(_key);
-                aesAlg.IV = new byte[16];
+                throw new ArgumentException("The text to decrypt cannot be null or empty.");
+            }
 
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+            var cipherBytes = Convert.FromBase64String(cipherText);
 
-                using MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(cipherText));
-                using CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
-                using StreamReader srDecrypt = new StreamReader(csDecrypt);
-                return srDecrypt.ReadToEnd();
+            using (var aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(_key);
+
+                using (var memoryStream = new MemoryStream(cipherBytes))
+                {
+                    var iv = new byte[16];
+                    memoryStream.Read(iv, 0, iv.Length);
+                    aes.IV = iv;
+
+                    using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
+                    using (var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                    using (var reader = new StreamReader(cryptoStream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
             }
         }
     }

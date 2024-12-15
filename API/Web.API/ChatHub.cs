@@ -34,12 +34,12 @@ namespace Web.API
 
         public async Task JoinPrivateChatAsync(Guid privateChatId)
         {
-            _logger.LogInformation("User {UserId} is attempting to join private chat {PrivateChatId}", Context.UserIdentifier, privateChatId);
+            _logger.LogInformation("User {UserId} is attempting to join private chat {PrivateChatId}", Context.ConnectionId, privateChatId);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, "pc" + privateChatId.ToString());
             await _userConnectionService.SetActivePrivateChatAsync(Context.ConnectionId, privateChatId);
 
-            _logger.LogInformation("User {UserId} has joined private chat {PrivateChatId}", Context.UserIdentifier, privateChatId);
+            _logger.LogInformation("User {UserId} has joined private chat {PrivateChatId}", Context.ConnectionId, privateChatId);
         }
 
         public async Task LeavePrivateChatAsync(Guid privateChatId)
@@ -59,12 +59,12 @@ namespace Web.API
 
         public async Task JoinGroupAsync(Guid groupId)
         {
-            _logger.LogInformation("User {UserId} is attempting to join group {GroupId}", Context.UserIdentifier, groupId);
+            _logger.LogInformation("User {UserId} is attempting to join group {GroupId}", Context.ConnectionId, groupId);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, "g" + groupId.ToString());
             await _userConnectionService.SetActiveGroupAsync(Context.ConnectionId, groupId);
 
-            _logger.LogInformation("User {UserId} has joined group {GroupId}", Context.UserIdentifier, groupId);
+            _logger.LogInformation("User {UserId} has joined group {GroupId}", Context.ConnectionId, groupId);
         }
 
         public async Task LeaveGroupAsync(Guid groupId)

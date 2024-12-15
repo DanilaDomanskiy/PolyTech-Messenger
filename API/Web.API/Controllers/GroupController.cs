@@ -170,19 +170,22 @@ namespace Web.API.Controllerss
         [HttpPatch("image/{groupId}")]
         public async Task<IActionResult> UpdateGroupImage(Guid groupId, IFormFile? file)
         {
-            string? oldFile;
-            _logger.LogInformation("Attempting to update group image for group ID: {GroupId}", groupId);
             var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == "userId")?.Value;
             if (Guid.TryParse(userIdClaim, out Guid currentUserId))
             {
+                _logger.LogInformation("Attempting to update group image for group ID: {GroupId}", groupId);
+
+                string profileImagesFolder = Path.Combine(_folderPath, "group-images");
+
+                Directory.CreateDirectory(profileImagesFolder);
+
+                string? oldFile;
+
                 if (!await _groupService.IsUserGroupCreatorAsync(currentUserId, groupId))
                 {
                     _logger.LogWarning("Forbidden: User is not the creator of the group.");
                     return Forbid();
                 }
-
-                string profileImagesFolder = Path.Combine(_folderPath, "profile-images");
-                Directory.CreateDirectory(profileImagesFolder);
 
                 if (file == null || file.Length == 0)
                 {
@@ -191,23 +194,25 @@ namespace Web.API.Controllerss
                     if (oldFile != null) System.IO.File.Delete(oldFile);
                     await _groupService.UpdateGroupImageAsync(groupId, null);
                     _logger.LogInformation("Group image removed successfully.");
-                    return NoContent();
+                    return Created();
                 }
+                else
+                {
+                    if (file.Length > 5 * 1024 * 1024)
+                    {
+                        _logger.LogWarning("Image size exceeds limit for group ID: {GroupId}", groupId);
+                        return StatusCode(409);
+                    }
 
-                if (file.Length > 5 * 1024 * 1024)
-                {
-                    _logger.LogWarning("Image size exceeds limit for group ID: {GroupId}", groupId);
-                    return StatusCode(409);
-                }
-
-                try
-                {
-                    using var image = SixLabors.ImageSharp.Image.Load(file.OpenReadStream());
-                }
-                catch (SixLabors.ImageSharp.UnknownImageFormatException ex)
-                {
-                    _logger.LogError(ex, "Invalid image format for group ID: {GroupId}", groupId);
-                    return StatusCode(409);
+                    try
+                    {
+                        using var image = SixLabors.ImageSharp.Image.Load(file.OpenReadStream());
+                    }
+                    catch (SixLabors.ImageSharp.UnknownImageFormatException ex)
+                    {
+                        _logger.LogError(ex, "Invalid image format for group ID: {GroupId}", groupId);
+                        return StatusCode(409);
+                    }
                 }
 
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();

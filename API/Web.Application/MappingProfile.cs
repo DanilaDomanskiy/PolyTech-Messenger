@@ -13,7 +13,6 @@ namespace Web.Application
         {
             CreateMap<SaveMessageDto, Message>();
             CreateMap<Message, ReceiveChatMessageDto>();
-            CreateMap<Message, ReadGroupMessageDto>();
             CreateMap<RegisterUserDto, User>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => false))
                 .ForMember(dest => dest.LastActive, opt => opt.MapFrom(src => DateTime.UtcNow));

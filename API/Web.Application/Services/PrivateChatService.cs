@@ -29,16 +29,14 @@ namespace Web.Application.Services
         public async Task<IEnumerable<PrivateChatItemDto>> GetChatsAsync(Guid currentUserId)
         {
             var chats = await _privateChatRepository.ReadChatsWithSecondUserAsync(currentUserId);
-
-            if (chats == null) return Enumerable.Empty<PrivateChatItemDto>();
+            if (chats == null || !chats.Any())
+                return Enumerable.Empty<PrivateChatItemDto>();
 
             return chats.Select(chat =>
             {
-                var otherUser = chat.Users.FirstOrDefault(user => user.Id != currentUserId);
-
-                var lastMessage = chat.Messages.FirstOrDefault();
-
-                if (lastMessage != null && lastMessage.Content.Length % 4 == 0)
+                var otherUser = chat.Users?.FirstOrDefault(user => user.Id != currentUserId);
+                var lastMessage = chat.Messages?.FirstOrDefault();
+                if (!string.IsNullOrEmpty(lastMessage?.Content))
                 {
                     lastMessage.Content = _encryptionService.Decrypt(lastMessage.Content);
                 }
@@ -48,9 +46,9 @@ namespace Web.Application.Services
                     Id = chat.Id,
                     SecondUser = otherUser != null ? _mapper.Map<SecondUser>(otherUser) : null,
                     LastMessage = lastMessage != null ? _mapper.Map<LastMessage>(lastMessage) : null,
-                    UnreadMessagesCount = chat.UnreadMessages.Any() ? chat.UnreadMessages.First().Count : 0,
+                    UnreadMessagesCount = chat.UnreadMessages?.Sum(um => um.Count) ?? 0
                 };
-            });
+            }).ToList();
         }
 
         public async Task<Guid?> CreateChatAsync(Guid currentUserId, CreateChatDto model)

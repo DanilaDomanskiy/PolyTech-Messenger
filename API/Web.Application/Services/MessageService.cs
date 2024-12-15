@@ -30,16 +30,25 @@ namespace Web.Application.Services
             return await _messageRepository.CreateAsync(message);
         }
 
-        public async Task<IEnumerable<ReadGroupMessageDto>?> GetGroupMessagesAsync(Guid groupId, Guid userId, int page, int pageSize)
+        public async Task<IEnumerable<ReceiveGroupMessageDto>?> GetGroupMessagesAsync(Guid groupId, Guid userId, int page, int pageSize)
         {
             var messages = await _messageRepository.ReadGroupMessagesAsync(groupId, userId, page, pageSize);
 
             return messages?.Select(message =>
             {
-                var readMessage = _mapper.Map<ReadGroupMessageDto>(message);
-                readMessage.Content = _encryptionService.Decrypt(readMessage.Content);
-                readMessage.SenderName = message.Sender.Name;
-                return readMessage;
+                return new ReceiveGroupMessageDto
+                {
+                    Id = message.Id,
+                    Content = _encryptionService.Decrypt(message.Content),
+                    Timestamp = message.Timestamp,
+                    GroupId = groupId,
+                    Sender = new Sender
+                    {
+                        Id = message.SenderId,
+                        Name = message.Sender.Name,
+                        ProfileImagePath = message.Sender.ProfileImagePath
+                    }
+                };
             });
         }
 
