@@ -1,10 +1,13 @@
 {
-  "chat": {
-    "statusOnline": "Online",
-    "statusOffline": "Last seen: {{lastActive}}",
-    "placeholder": "Enter message...",
-    "send": "Send",
-    "you": "You",
-    "selectLanguage": "Select language"
-  }
+  "search_placeholder": "Search...",
+  "users_not_found": "Users not found",
+  "search_icon": "Search icon",
+  "chats": "Chats",
+  "groups": "Groups",
+  "you": "You: ",
+  "status_online": "Online",
+  "status_offline": "Last active: ",
+  "placeholder_message": "Enter message...",
+  "button_send": "Send",
+  "error": "Error on the server side!"
 }

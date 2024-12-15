@@ -5,7 +5,6 @@ import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
 import { DateTime } from "luxon";
 import { useTranslation } from "react-i18next"; // Импорт useTranslation
-import i18n from "i18next";
 
 const formatDate = (dateString) => {
   const date = DateTime.fromISO(dateString, { zone: "utc" }).setZone(
@@ -39,11 +38,12 @@ const ChatPage = () => {
   const location = useLocation();
   const chatId = location.state?.chatId;
   const userName = location.state?.userName;
+  const userProfilePicture = location.state?.userProfilePicture;
   const { connection, handleError } = useSignalR();
   const messagesEndRef = useRef(null);
   const scrollRef = useRef(null);
   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Получение userId
   const fetchUserId = async () => {
@@ -82,7 +82,6 @@ const ChatPage = () => {
           withCredentials: true,
         }
       );
-      console.log(response.data);
 
       const newMessages = Array.isArray(response.data)
         ? response.data
@@ -261,19 +260,27 @@ const ChatPage = () => {
 
   const getUserStatus = (isActive, lastActive) => {
     if (isActive) {
-      return t("chat.statusOnline");
+      return t("status_online");
     }
-    console.log(i18n.language); // Проверка текущего языка
-    return t("chat.statusOffline", { lastActive: formatDate(lastActive) });
+    return t("status_offline") + formatDate(lastActive);
   };
+
+  useEffect(() => {
+    // При загрузке компонента проверяем, сохранен ли язык в localStorage
+    const savedLanguage = localStorage.getItem("appLanguage") || "ru"; // По умолчанию русский
+    i18n.changeLanguage(savedLanguage); // Устанавливаем язык в i18n
+  }, []);
 
   return (
     <div className="chat-page">
       <div className="chat-header">
-        <h3>{userName}</h3>
-        <span className="status">
-          {getUserStatus(userStatus.isActive, userStatus.lastActive)}
-        </span>
+        <img src={userProfilePicture} alt="img" className="avatar" />
+        <div className="user-info">
+          <h3 className="user-name">{userName}</h3>
+          <span className="status">
+            {getUserStatus(userStatus.isActive, userStatus.lastActive)}
+          </span>
+        </div>
       </div>
 
       <div className="chat-messages" onScroll={handleScroll} ref={scrollRef}>
@@ -297,10 +304,10 @@ const ChatPage = () => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={t("chat.placeholder")}
+          placeholder={t("placeholder_message")}
         />
         <button onClick={handleSendMessage} disabled={!isConnected}>
-          {t("chat.send")}
+          {t("button_send")}
         </button>
       </div>
     </div>

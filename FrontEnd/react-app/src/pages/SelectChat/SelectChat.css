@@ -131,6 +131,10 @@ body {
   margin-right: 15px; /* Отступ от изображения */
 }
 
+.avatar {
+  border: 2px solid #2c804c; /* Тонкая рамка вокруг аватара */
+}
+
 /* Стиль для индикатора статуса */
 .status-indicator {
   position: absolute;

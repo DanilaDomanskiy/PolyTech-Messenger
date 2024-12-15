@@ -14,12 +14,45 @@
 }
 
 .chat-header {
+  display: flex; /* Flexbox для горизонтального выравнивания */
+  align-items: center; /* Выравниваем элементы по вертикали */
+  justify-content: center;
   background-color: #2c804c;
   padding: 15px;
   color: white;
-  text-align: center;
-  font-size: 24px; /* Увеличенный размер текста для заголовка */
-  font-weight: bold;
+}
+
+.chat-header .avatar {
+  width: 60px; /* Размер аватара */
+  height: 60px;
+  border-radius: 50%; /* Круглый аватар */
+  object-fit: cover;
+  border: 2px solid #2c804c; /* Тонкая рамка вокруг аватара */
+  margin-right: 15px; /* Отступ справа от аватарки */
+}
+
+.chat-header .user-info {
+  display: flex;
+  flex-direction: column; /* Располагаем имя и активность вертикально */
+}
+
+.chat-header .user-info .user-name {
+  font-size: 25px; /* Размер текста имени */
+  font-weight: bold; /* Жирный текст для имени */
+  margin: 0;
+  color: white;
+}
+
+.chat-header .user-info .status {
+  font-size: 14px; /* Размер текста статуса */
+  color: rgb(189, 189, 189); /* Светло-серый цвет для статуса */
+  margin-top: 5px;
+}
+
+.chat-header .user-container {
+  display: flex; /* Контейнер для имени и аватарки */
+  align-items: center; /* Выравнивание по центру */
+  gap: 10px; /* Отступ между аватаркой и текстом */
 }
 
 .chat-messages {

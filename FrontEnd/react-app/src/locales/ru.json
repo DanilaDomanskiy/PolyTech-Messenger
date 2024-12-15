@@ -1,10 +1,13 @@
 {
-  "chat": {
-    "statusOnline": "В сети",
-    "statusOffline": "Последний раз в сети: {{lastActive}}",
-    "placeholder": "Введите сообщение...",
-    "send": "Отправить",
-    "you": "Вы",
-    "selectLanguage": "Выбор языка"
-  }
+  "search_placeholder": "Поиск...",
+  "users_not_found": "Пользователи не найдены",
+  "search_icon": "Иконка поиска",
+  "chats": "Чаты",
+  "groups": "Группы",
+  "you": "Вы: ",
+  "status_online": "В сети",
+  "status_offline": "Был(-а) в сети: ",
+  "placeholder_message": "Введите сообщение...",
+  "button_send": "Отправить",
+  "error": "Ошибка на стороне сервера!"
 }

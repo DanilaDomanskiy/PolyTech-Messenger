@@ -11,7 +11,7 @@ const ChatMessages = () => {
   const [userId, setUserId] = useState(null); // Хранение текущего userId
   const { connection, handleError } = useSignalR();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // Получение текущего userId
   useEffect(() => {
@@ -94,13 +94,13 @@ const ChatMessages = () => {
   }, [handleError]);
 
   // Обработка клика по чату
-  const handleChatClick = (chatId, userName) => {
+  const handleChatClick = (chatId, userName, userProfilePicture) => {
     setChats((prevChats) =>
       prevChats.map((chat) =>
         chat.id === chatId ? { ...chat, unreadMessagesCount: 0 } : chat
       )
     );
-    navigate("/chat", { state: { chatId, userName } });
+    navigate("/chat", { state: { chatId, userName, userProfilePicture } });
   };
 
   // Отображение последнего сообщения
@@ -109,7 +109,7 @@ const ChatMessages = () => {
 
     return (
       <span>
-        {isSentByCurrentUser ? "Вы: " : `${secondUser.name || ""}: `}
+        {isSentByCurrentUser ? `${t("you")}` : `${secondUser.name || ""}: `}
         {lastMessage.content}
       </span>
     );
@@ -121,10 +121,20 @@ const ChatMessages = () => {
         {chats.map((chat) => (
           <li
             key={chat.id}
-            onClick={() => handleChatClick(chat.id, chat.secondUser.name)}
+            onClick={() =>
+              handleChatClick(
+                chat.id,
+                chat.secondUser.name,
+                chat.secondUser.profileImagePath || avatar
+              )
+            }
           >
             <div className="profile-container">
-              <img src={avatar} alt={`${chat.secondUser.name}'s profile`} />
+              <img
+                src={avatar}
+                alt={`${chat.secondUser.name}'s profile`}
+                className="avatar"
+              />
               {chat.secondUser.isActive && <div className="status-indicator" />}
             </div>
 
