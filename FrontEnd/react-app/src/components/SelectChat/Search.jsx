@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import search from "../../assets/images/search.png";
-import Sergey from "../../assets/images/Sergey.jpg";
+import avatar from "../../assets/images/download.jpg";
 import settingsIcons from "../../assets/images/Settings.png";
 import { useSignalR } from "../../SignalRProvider";
 import Settings from "../Settings/Settings";
@@ -118,12 +118,12 @@ const Search = () => {
                     handleSelectUser(
                       user.id,
                       user.name,
-                      user.profilePicturePath || Sergey
+                      user.profilePicturePath || avatar
                     )
                   }
                 >
                   <img
-                    src={user.profilePicturePath || Sergey} // Указываем путь к аватарке или дефолтное изображение
+                    src={user.profilePicturePath || avatar} // Указываем путь к аватарке или дефолтное изображение
                     alt={user.name}
                     className="user-avatar"
                   />

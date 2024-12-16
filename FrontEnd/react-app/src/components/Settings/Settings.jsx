@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/Settings.css";
-import Sergey from "../../assets/images/Sergey.jpg";
+import avatar from "../../assets/images/download.jpg";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useSignalR } from "../../SignalRProvider";
@@ -9,54 +9,50 @@ const Settings = ({ onClose }) => {
   const { t, i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
   const { handleError } = useSignalR();
-  const [currentUser, setCurrentUser] = useState({
-    userName: "",
-    profileImage: "",
-  });
 
-  // Данные профиля, которые отображаются
   const [profileData, setProfileData] = useState({
     name: "",
-    profileImage: Sergey,
+    profileImage: avatar,
   });
 
-  // Редактируемые данные
   const [editedData, setEditedData] = useState({
     name: "",
     oldPassword: "",
     newPassword: "",
-    profileImage: Sergey,
+    profileImage: avatar,
   });
 
   const [isEditing, setIsEditing] = useState(false);
 
+  // Состояние для ошибки текущего пароля
+  const [passwordError, setPasswordError] = useState(false);
+
+  const handleGetUser = async () => {
+    try {
+      const response = await axios.get(`https://localhost:7205/api/user`, {
+        withCredentials: true,
+      });
+
+      console.log(response.data);
+      const user = {
+        userName: response.data.name,
+        profileImage: response.data.profileImagePath,
+      };
+      setProfileData({
+        name: user.userName,
+        profileImage: user.profileImage,
+      });
+      setEditedData({
+        ...editedData,
+        name: user.userName,
+        profileImage: user.profileImage,
+      });
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   useEffect(() => {
-    const handleGetUser = async () => {
-      try {
-        const response = await axios.get(`https://localhost:7205/api/user`, {
-          withCredentials: true,
-        });
-        const user = {
-          userName: response.data.name,
-          profileImage: response.data.profileImagePath || Sergey,
-        };
-
-        // Обновляем текущего пользователя и профильные данные
-        setCurrentUser(user);
-        setProfileData({
-          name: user.userName,
-          profileImage: user.profileImage,
-        });
-        setEditedData({
-          ...editedData,
-          name: user.userName,
-          profileImage: user.profileImage,
-        });
-      } catch (error) {
-        handleError(error);
-      }
-    };
-
     handleGetUser();
   }, []);
 
@@ -71,7 +67,7 @@ const Settings = ({ onClose }) => {
     const savedLanguage = localStorage.getItem("appLanguage") || "ru";
     i18n.changeLanguage(savedLanguage);
     setCurrentLanguage(savedLanguage);
-  }, []);
+  }, [i18n]);
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -84,14 +80,10 @@ const Settings = ({ onClose }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setEditedData((prev) => ({
-          ...prev,
-          profileImage: reader.result, // Сохраняем base64-изображение
-        }));
-      };
-      reader.readAsDataURL(file);
+      setEditedData((prev) => ({
+        ...prev,
+        profileImage: file, // Сохраняем исходный объект File
+      }));
     }
   };
 
@@ -99,6 +91,9 @@ const Settings = ({ onClose }) => {
     const { name, oldPassword, newPassword, profileImage } = editedData;
 
     try {
+      // Сбрасываем ошибку текущего пароля перед началом обработки
+      setPasswordError(false);
+
       // Изменение имени
       if (name !== profileData.name) {
         await fetch("https://localhost:7205/api/user/name", {
@@ -109,45 +104,62 @@ const Settings = ({ onClose }) => {
           credentials: "include",
           body: JSON.stringify({ name }),
         });
-        console.log("Имя успешно обновлено.");
       }
 
       // Изменение пароля
       if (oldPassword && newPassword) {
-        await fetch("https://localhost:7205/api/user/password", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ oldPassword, newPassword }),
-        });
-        console.log("Пароль успешно обновлен.");
+        const passwordResponse = await fetch(
+          "https://localhost:7205/api/user/password",
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ oldPassword, newPassword }),
+          }
+        );
+
+        if (!passwordResponse.ok) {
+          if (
+            passwordResponse.status >= 400 &&
+            passwordResponse.status <= 499
+          ) {
+            // Устанавливаем ошибку для текущего пароля
+            setPasswordError(true);
+            return; // Завершаем обработку, так как пароль не сохранен
+          } else {
+            throw new Error("Password update failed");
+          }
+        }
       }
 
       // Изменение изображения
       if (profileImage !== profileData.profileImage) {
         const formData = new FormData();
-        formData.append("profileImage", profileImage);
+        formData.append("file", profileImage);
 
-        await fetch("https://localhost:7205/api/user/profile-image", {
-          method: "PATCH",
-          credentials: "include",
-          body: formData,
-        });
-        console.log("Фотография успешно обновлена.");
+        const imageResponse = await fetch(
+          "https://localhost:7205/api/user/profile-image",
+          {
+            method: "PATCH",
+            credentials: "include",
+            body: formData,
+          }
+        );
+
+        if (!imageResponse.ok) {
+          throw new Error("Image update failed");
+        }
       }
 
-      // Обновляем профильные данные после успешного сохранения
-      setProfileData({
-        name,
-        profileImage,
-      });
-
-      alert(t("settings_save_success"));
+      // После успешного сохранения загружаем актуальные данные с сервера
+      await handleGetUser();
     } catch (error) {
-      console.error("Ошибка при сохранении данных:", error);
-      alert(t("settings_save_error"));
+      // Если ошибка не связана с паролем, вызываем обработчик
+      if (!passwordError) {
+        handleError(error);
+      }
     }
 
     setIsEditing(false); // Закрываем режим редактирования после сохранения
@@ -163,7 +175,7 @@ const Settings = ({ onClose }) => {
         <div className="profile-section">
           <img
             src={profileData.profileImage}
-            alt="Аватар"
+            alt="Аватарка"
             className="profile-avatar"
           />
           <div className="profile-info">
@@ -221,7 +233,15 @@ const Settings = ({ onClose }) => {
                 placeholder={t("settings_placeholder_old_password")}
                 value={editedData.oldPassword}
                 onChange={handleEditChange}
+                style={{
+                  border: passwordError ? "2px solid red" : "1px solid #ccc", // Красная граница при ошибке, иначе стандартная
+                }}
               />
+              {passwordError && (
+                <span className="error-text">
+                  {t("settings_error_incorrect_current_password")}
+                </span>
+              )}
             </div>
             <div className="edit-item">
               <label htmlFor="edit-new-password">

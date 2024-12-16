@@ -21,5 +21,6 @@
   "settings_edit_profile_new_password": "New password: ",
   "settings_placeholder_new_password": "Enter a new password...",
   "settings_edit_profile_photo": "Edit a photo: ",
-  "settings_save_button": "Save"
+  "settings_save_button": "Save",
+  "settings_error_incorrect_current_password": "Invalid current password!"
 }

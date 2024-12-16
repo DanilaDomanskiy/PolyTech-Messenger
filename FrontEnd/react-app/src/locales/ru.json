@@ -21,5 +21,6 @@
   "settings_edit_profile_new_password": "Новый пароль: ",
   "settings_placeholder_new_password": "Введите новый пароль...",
   "settings_edit_profile_photo": "Изменить фото: ",
-  "settings_save_button": "Сохранить"
+  "settings_save_button": "Сохранить",
+  "settings_error_incorrect_current_password": "Неверный текущий пароль!"
 }
