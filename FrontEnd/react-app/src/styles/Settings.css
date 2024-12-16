@@ -16,7 +16,7 @@
 .modal-content {
   background: #fff;
   border-radius: 10px;
-  padding: 20px;
+  padding: 15px;
   width: 90%;
   max-width: 400px;
   position: relative;
@@ -95,6 +95,10 @@
   gap: 15px;
 }
 
+.language-select {
+  margin-top: -5px;
+}
+
 .setting-item {
   display: flex;
   flex-direction: column;
@@ -112,4 +116,65 @@
   font-size: 14px;
   color: #555;
   cursor: pointer;
+}
+
+.edit-profile-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.edit-profile-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: center; /* Заголовок выровнен по левому краю */
+}
+
+.edit-item {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column; /* Поля выстроены вертикально */
+  align-items: flex-start; /* Выравниваем содержимое по левому краю */
+}
+
+.edit-item label {
+  font-size: 14px;
+  color: #555; /* Цвет текста для меток */
+  margin-bottom: 5px; /* Отступ между меткой и полем ввода */
+}
+
+.edit-item input[type="text"],
+.edit-item input[type="password"] {
+  width: 100%; /* Поле ввода занимает всю ширину контейнера */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.edit-item input[type="file"] {
+  padding: 4px;
+  font-size: 14px; /* Размер шрифта для файлового ввода */
+}
+
+.edit-item input::placeholder {
+  color: #aaa; /* Цвет текста-заполнителя */
+}
+
+.save-profile-btn {
+  width: 100%; /* Кнопка растягивается на всю ширину */
+  padding: 10px;
+  background-color: #2c804c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center; /* Текст кнопки по центру */
+}
+
+.save-profile-btn:hover {
+  background-color: #1f6f3e;
 }

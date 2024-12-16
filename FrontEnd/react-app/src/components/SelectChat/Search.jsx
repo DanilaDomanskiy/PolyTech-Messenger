@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import search from "../../assets/images/search.png";
-import avatar from "../../assets/images/download.jpg";
+import Sergey from "../../assets/images/Sergey.jpg";
 import settingsIcons from "../../assets/images/Settings.png";
 import { useSignalR } from "../../SignalRProvider";
 import Settings from "../Settings/Settings";
@@ -16,10 +16,6 @@ const Search = () => {
   const { t, i18n } = useTranslation();
   const { handleError } = useSignalR();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState({
-    userName: "",
-    profileImage: "",
-  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,24 +75,6 @@ const Search = () => {
     setUserSelected(true);
   };
 
-  useEffect(() => {
-    const handleGetUser = async () => {
-      try {
-        const response = await axios.get(`https://localhost:7205/api/user`, {
-          withCredentials: true,
-        });
-        setCurrentUser({
-          userName: response.data.name,
-          profileImage: response.data.profileImagePath,
-        });
-      } catch (error) {
-        handleError(error);
-      }
-    };
-
-    handleGetUser();
-  }, []);
-
   const openSettings = () => {
     setIsModalOpen(true);
   };
@@ -125,13 +103,7 @@ const Search = () => {
       />
 
       {/* Модальное окно для настроек */}
-      {isModalOpen && (
-        <Settings
-          onClose={closeSettings}
-          userName={currentUser.userName}
-          profileImage={currentUser.profileImage}
-        />
-      )}
+      {isModalOpen && <Settings onClose={closeSettings} />}
 
       {searchQuery &&
         users.length > 0 &&
@@ -146,12 +118,12 @@ const Search = () => {
                     handleSelectUser(
                       user.id,
                       user.name,
-                      user.profilePicturePath || avatar
+                      user.profilePicturePath || Sergey
                     )
                   }
                 >
                   <img
-                    src={user.profilePicturePath || avatar} // Указываем путь к аватарке или дефолтное изображение
+                    src={user.profilePicturePath || Sergey} // Указываем путь к аватарке или дефолтное изображение
                     alt={user.name}
                     className="user-avatar"
                   />

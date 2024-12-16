@@ -9,5 +9,17 @@
   "status_offline": "Быў(-ла) у сетцы: ",
   "placeholder_message": "Увядзіце паведамленне...",
   "button_send": "Адправіць",
-  "error": "Памылка на баку сервера!"
+  "error": "Памылка на баку сервера!",
+  "settings_profile": "Профіль",
+  "settings_edit_profile_button": "Рэдагаваць профіль",
+  "settings_select_language": "Выбар мовы: ",
+  "settings_cancel": "Адмена",
+  "settings_edit_profile": "Рэдагаванне профілю",
+  "settings_edit_profile_name": "Імя: ",
+  "settings_edit_profile_old_password": "Цяперашні пароль: ",
+  "settings_placeholder_old_password": "Увядзіце цяперашні пароль...",
+  "settings_edit_profile_new_password": "Новы пароль: ",
+  "settings_placeholder_new_password": "Увядзіце новы пароль...",
+  "settings_edit_profile_photo": "Змяніць фота: ",
+  "settings_save_button": "Захаваць"
 }

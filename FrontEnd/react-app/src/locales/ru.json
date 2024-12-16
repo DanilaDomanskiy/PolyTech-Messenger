@@ -9,5 +9,17 @@
   "status_offline": "Был(-а) в сети: ",
   "placeholder_message": "Введите сообщение...",
   "button_send": "Отправить",
-  "error": "Ошибка на стороне сервера!"
+  "error": "Ошибка на стороне сервера!",
+  "settings_profile": "Профиль",
+  "settings_edit_profile_button": "Редактировать профиль",
+  "settings_select_language": "Выбор языка: ",
+  "settings_cancel": "Отмена",
+  "settings_edit_profile": "Редактирование профиля",
+  "settings_edit_profile_name": "Имя: ",
+  "settings_edit_profile_old_password": "Текущий пароль: ",
+  "settings_placeholder_old_password": "Введите текущий пароль...",
+  "settings_edit_profile_new_password": "Новый пароль: ",
+  "settings_placeholder_new_password": "Введите новый пароль...",
+  "settings_edit_profile_photo": "Изменить фото: ",
+  "settings_save_button": "Сохранить"
 }

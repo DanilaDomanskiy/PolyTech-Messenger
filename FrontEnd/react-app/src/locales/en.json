@@ -9,5 +9,17 @@
   "status_offline": "Last active: ",
   "placeholder_message": "Enter message...",
   "button_send": "Send",
-  "error": "Error on the server side!"
+  "error": "Error on the server side!",
+  "settings_profile": "Profile",
+  "settings_edit_profile_button": "Edit profile",
+  "settings_select_language": "Language selection: ",
+  "settings_cancel": "Cancel",
+  "settings_edit_profile": "Editing profile",
+  "settings_edit_profile_name": "Name: ",
+  "settings_edit_profile_old_password": "Current password: ",
+  "settings_placeholder_old_password": "Enter a current password...",
+  "settings_edit_profile_new_password": "New password: ",
+  "settings_placeholder_new_password": "Enter a new password...",
+  "settings_edit_profile_photo": "Edit a photo: ",
+  "settings_save_button": "Save"
 }
